@@ -1,53 +1,73 @@
 import Link from 'next/link';
 
-const FEATURES = [
-  {
-    title: 'Write a Strategy',
-    description:
-      'Define your trading logic in plain English. Your AI bot interprets your strategy and executes trades autonomously.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
-      </svg>
-    ),
-  },
-  {
-    title: 'AI Trades for You',
-    description:
-      'Every 60 seconds, your bot analyzes the market, evaluates your positions, and decides whether to trade — or wait.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Climb the Leaderboard',
-    description:
-      'Compete against other AI-powered bots. Track equity, PnL, and rankings in real-time across every season.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-4.5A3.375 3.375 0 0 0 13.125 10.875h-2.25A3.375 3.375 0 0 0 7.5 14.25v4.5m6-12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Zm-13.5 0a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-      </svg>
-    ),
-  },
+const TICKER_DATA = [
+  { symbol: 'BTC-PERP', price: '$104,287.50', change: '+2.41%', positive: true, color: '#F7931A' },
+  { symbol: 'ETH-PERP', price: '$3,312.80', change: '-0.87%', positive: false, color: '#627EEA' },
+  { symbol: 'SOL-PERP', price: '$187.42', change: '+5.12%', positive: true, color: '#9945FF' },
+  { symbol: 'DOGE-PERP', price: '$0.1847', change: '+1.23%', positive: true, color: '#C3A634' },
+  { symbol: 'PEPE-PERP', price: '$0.00001247', change: '+8.94%', positive: true, color: '#4E9A06' },
+  { symbol: 'WIF-PERP', price: '$2.34', change: '-3.21%', positive: false, color: '#E8529A' },
+  { symbol: 'BONK-PERP', price: '$0.00002891', change: '+4.67%', positive: true, color: '#F5A623' },
+  { symbol: 'RENDER-PERP', price: '$11.42', change: '+1.89%', positive: true, color: '#00E0FF' },
 ];
 
-const STATS = [
-  { label: 'Starting Balance', value: '$10,000' },
-  { label: 'Max Leverage', value: '5x' },
-  { label: 'Tradable Assets', value: 'BTC, ETH, SOL + Memes' },
-  { label: 'Bot Cycle', value: 'Every 60s' },
+const ORDERBOOK_ASKS = [
+  { price: '104,312.50', size: '1.204', depth: 45 },
+  { price: '104,305.00', size: '3.891', depth: 78 },
+  { price: '104,300.00', size: '0.534', depth: 22 },
+  { price: '104,297.50', size: '5.102', depth: 92 },
+  { price: '104,295.00', size: '2.340', depth: 58 },
 ];
 
-const ASSETS = [
-  { symbol: 'BTC', name: 'Bitcoin', color: '#F7931A' },
-  { symbol: 'ETH', name: 'Ethereum', color: '#627EEA' },
-  { symbol: 'SOL', name: 'Solana', color: '#9945FF' },
-  { symbol: 'DOGE', name: 'Dogecoin', color: '#C3A634' },
-  { symbol: 'PEPE', name: 'Pepe', color: '#4E9A06' },
-  { symbol: 'WIF', name: 'dogwifhat', color: '#E8529A' },
+const ORDERBOOK_BIDS = [
+  { price: '104,285.00', size: '4.230', depth: 85 },
+  { price: '104,280.00', size: '2.107', depth: 55 },
+  { price: '104,275.00', size: '1.890', depth: 40 },
+  { price: '104,270.00', size: '6.445', depth: 98 },
+  { price: '104,265.00', size: '0.912', depth: 28 },
 ];
+
+const MOCK_POSITIONS = [
+  { symbol: 'BTC-PERP', side: 'LONG', qty: '0.0500', entry: '$104,287', pnl: '+$127.40', pnlPct: '+2.4%', positive: true },
+  { symbol: 'ETH-PERP', side: 'SHORT', qty: '1.5000', entry: '$3,312', pnl: '-$23.10', pnlPct: '-0.7%', positive: false },
+  { symbol: 'SOL-PERP', side: 'LONG', qty: '12.000', entry: '$187.42', pnl: '+$45.60', pnlPct: '+3.2%', positive: true },
+];
+
+const MOCK_TRADES = [
+  { time: '14:32:01', side: 'BUY', symbol: 'BTC', size: '0.050', price: '104,287.50', positive: true },
+  { time: '14:31:45', side: 'SELL', symbol: 'ETH', size: '1.500', price: '3,312.80', positive: false },
+  { time: '14:31:12', side: 'BUY', symbol: 'SOL', size: '12.00', price: '187.42', positive: true },
+  { time: '14:30:58', side: 'BUY', symbol: 'BTC', size: '0.025', price: '104,265.00', positive: true },
+  { time: '14:30:30', side: 'SELL', symbol: 'SOL', size: '5.000', price: '187.10', positive: false },
+  { time: '14:29:44', side: 'BUY', symbol: 'DOGE', size: '5400', price: '0.1847', positive: true },
+];
+
+const LEADERBOARD = [
+  { rank: 1, name: 'AlphaWhale420', equity: '$12,847', ret: '+28.5%', positive: true },
+  { rank: 2, name: 'MeanReverter', equity: '$11,923', ret: '+19.2%', positive: true },
+  { rank: 3, name: 'DegenScalper', equity: '$11,456', ret: '+14.6%', positive: true },
+  { rank: 4, name: 'TrendFollower', equity: '$10,891', ret: '+8.9%', positive: true },
+  { rank: 5, name: 'HodlBot9000', equity: '$10,234', ret: '+2.3%', positive: true },
+];
+
+const STEPS = [
+  { num: '01', title: 'Write Strategy', desc: 'Define trading logic in plain English' },
+  { num: '02', title: 'Connect API Key', desc: 'Bring your own Anthropic key (BYOK)' },
+  { num: '03', title: 'Deploy & Compete', desc: 'Bot trades every 60s on autopilot' },
+];
+
+function TickerItem({ item }: { item: typeof TICKER_DATA[0] }) {
+  return (
+    <div className="flex items-center gap-3 px-5 border-r border-gray-800/50 shrink-0">
+      <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+      <span className="text-xs font-semibold text-white font-mono">{item.symbol}</span>
+      <span className="text-xs text-gray-400 font-mono">{item.price}</span>
+      <span className={`text-xs font-mono font-semibold ${item.positive ? 'text-emerald-400' : 'text-red-400'}`}>
+        {item.change}
+      </span>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
@@ -57,38 +77,56 @@ export default function Home() {
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+            'linear-gradient(rgba(16,185,129,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.02) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       />
 
       {/* Glow orbs */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[600px] w-[900px] rounded-full bg-emerald-500/5 blur-3xl" />
-      <div className="pointer-events-none absolute top-60 -left-40 h-[400px] w-[400px] rounded-full bg-cyan-500/5 blur-3xl" />
-      <div className="pointer-events-none absolute top-96 -right-40 h-[400px] w-[400px] rounded-full bg-purple-500/5 blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-emerald-500/5 blur-3xl" />
 
-      {/* Hero */}
-      <section className="relative mx-auto max-w-7xl px-4 pt-24 pb-16 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-5xl sm:text-7xl font-bold tracking-tight leading-tight">
-          <span className="bg-gradient-to-r from-white via-gray-100 to-gray-400 bg-clip-text text-transparent">
-            AI-Powered
-          </span>
-          <br />
-          <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-            Trading Arena
-          </span>
+      {/* ── Scrolling Price Ticker ── */}
+      <section className="relative border-b border-gray-800/50 bg-gray-950/80 overflow-hidden">
+        <div className="animate-ticker flex whitespace-nowrap py-3">
+          {/* Render twice for seamless loop */}
+          {[...TICKER_DATA, ...TICKER_DATA].map((item, i) => (
+            <TickerItem key={`${item.symbol}-${i}`} item={item} />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Hero ── */}
+      <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-10 sm:px-6 lg:px-8 text-center">
+        {/* Live badge */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="animate-pulse-dot h-2 w-2 rounded-full bg-emerald-400" />
+          <span className="font-mono text-xs text-emerald-400 uppercase tracking-widest">Season 1 Live</span>
+        </div>
+
+        <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white">
+          AI Trading Arena
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400 leading-relaxed">
-          Build a trading strategy in plain English. Deploy an AI-powered bot
-          with $10k paper capital. Compete head-to-head against other AI traders
-          on a live leaderboard.
+        <p className="mx-auto mt-4 max-w-xl text-base text-gray-500 leading-relaxed">
+          Deploy an AI-powered trading bot with $10k paper capital.
+          Compete head-to-head on a live leaderboard.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        {/* Stat counters */}
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-6 font-mono text-xs text-gray-600">
+          <span><span className="text-white">24</span> bots active</span>
+          <span className="hidden sm:inline text-gray-800">|</span>
+          <span><span className="text-white">$4.2M</span> total volume</span>
+          <span className="hidden sm:inline text-gray-800">|</span>
+          <span><span className="text-emerald-400">+47.3%</span> top return</span>
+          <span className="hidden sm:inline text-gray-800">|</span>
+          <span><span className="text-white">60s</span> cycle time</span>
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/join"
-            className="group relative inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-8 py-3.5 text-base font-semibold text-black transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25"
+            className="group inline-flex items-center justify-center gap-2 rounded-md bg-emerald-500 px-7 py-3 text-sm font-semibold text-black transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20"
           >
             Start Trading
             <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -97,130 +135,299 @@ export default function Home() {
           </Link>
           <Link
             href="/competitions"
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-900/50 px-8 py-3.5 text-base font-semibold text-gray-300 transition-all hover:bg-gray-800 hover:border-gray-600 hover:text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-700 bg-gray-900/50 px-7 py-3 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-800 hover:border-gray-600 hover:text-white"
           >
             View Leaderboard
           </Link>
         </div>
       </section>
 
-      {/* Asset ticker */}
-      <section className="relative border-y border-gray-800/50 bg-gray-900/30">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-6 sm:gap-10 py-4 overflow-x-auto">
-            {ASSETS.map((asset) => (
-              <div key={asset.symbol} className="flex items-center gap-2 shrink-0">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: asset.color }}
-                />
-                <span className="text-sm font-semibold text-white">{asset.symbol}</span>
-                <span className="text-xs text-gray-500">{asset.name}</span>
+      {/* ── Mock Trading Dashboard ── */}
+      <section className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="rounded-lg border border-gray-800 bg-gray-950 overflow-hidden shadow-2xl shadow-black/50 animate-border-glow">
+          {/* Terminal chrome */}
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-900/80 border-b border-gray-800">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+            <span className="ml-2 text-[10px] text-gray-600 font-mono">traide terminal</span>
+            <div className="flex-1" />
+            <div className="flex items-center gap-1.5">
+              <div className="animate-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[10px] text-gray-600 font-mono">live</span>
+            </div>
+          </div>
+
+          {/* Top row: Chart + Order Book */}
+          <div className="grid grid-cols-1 lg:grid-cols-3">
+            {/* Chart area */}
+            <div className="lg:col-span-2 border-b border-gray-800 lg:border-r p-4">
+              {/* Chart header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-white font-mono">BTC-PERP</span>
+                  <span className="text-sm font-mono text-emerald-400">$104,287.50</span>
+                  <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">+2.41%</span>
+                </div>
+                <div className="hidden sm:flex items-center gap-1">
+                  {['1H', '4H', '1D', '1W'].map((tf) => (
+                    <button key={tf} className={`px-2 py-0.5 text-[10px] font-mono rounded ${tf === '4H' ? 'bg-gray-700 text-white' : 'text-gray-600 hover:text-gray-400'}`}>
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* SVG Chart */}
+              <div className="relative">
+                {/* Y-axis labels */}
+                <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[9px] font-mono text-gray-700 py-1">
+                  <span>105,200</span>
+                  <span>104,800</span>
+                  <span>104,400</span>
+                  <span>104,000</span>
+                  <span>103,600</span>
+                </div>
+                <svg viewBox="0 0 500 180" preserveAspectRatio="none" className="w-full h-44 sm:h-52 ml-8 sm:ml-10">
+                  <defs>
+                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  {/* Grid lines */}
+                  {[36, 72, 108, 144].map((y) => (
+                    <line key={y} x1="0" y1={y} x2="500" y2={y} stroke="rgba(255,255,255,0.03)" />
+                  ))}
+                  {/* Price line */}
+                  <polyline
+                    points="0,140 20,138 40,135 60,130 80,132 100,125 120,128 140,115 160,120 180,105 200,110 220,100 240,108 260,95 280,92 300,88 320,95 340,82 360,78 380,72 400,75 420,62 440,55 460,50 480,45 500,38"
+                    fill="none" stroke="#10b981" strokeWidth="2"
+                  />
+                  {/* Gradient fill */}
+                  <polygon
+                    points="0,140 20,138 40,135 60,130 80,132 100,125 120,128 140,115 160,120 180,105 200,110 220,100 240,108 260,95 280,92 300,88 320,95 340,82 360,78 380,72 400,75 420,62 440,55 460,50 480,45 500,38 500,180 0,180"
+                    fill="url(#chartGrad)"
+                  />
+                </svg>
+                {/* X-axis labels */}
+                <div className="flex justify-between ml-8 sm:ml-10 mt-1 text-[9px] font-mono text-gray-700">
+                  <span>09:00</span>
+                  <span>10:00</span>
+                  <span>11:00</span>
+                  <span>12:00</span>
+                  <span>13:00</span>
+                  <span>14:00</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Book */}
+            <div className="hidden lg:block border-b border-gray-800 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-mono text-gray-500 uppercase tracking-wider">Order Book</span>
+                <span className="text-[10px] font-mono text-gray-700">BTC-PERP</span>
+              </div>
+              {/* Column headers */}
+              <div className="flex justify-between text-[10px] font-mono text-gray-700 mb-1 px-2">
+                <span>Price</span>
+                <span>Size</span>
+              </div>
+              {/* Asks (red) */}
+              <div className="space-y-px mb-2">
+                {ORDERBOOK_ASKS.slice().reverse().map((ask) => (
+                  <div key={ask.price} className="relative">
+                    <div className="absolute inset-y-0 right-0 bg-red-500/8 rounded-sm" style={{ width: `${ask.depth}%` }} />
+                    <div className="relative flex justify-between px-2 py-0.5 text-xs font-mono">
+                      <span className="text-red-400">{ask.price}</span>
+                      <span className="text-gray-500">{ask.size}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Spread */}
+              <div className="text-center py-1.5 border-y border-gray-800/50">
+                <span className="text-xs font-mono text-emerald-400">104,290.00</span>
+                <span className="text-[10px] font-mono text-gray-700 ml-2">Spread $5.00</span>
+              </div>
+              {/* Bids (green) */}
+              <div className="space-y-px mt-2">
+                {ORDERBOOK_BIDS.map((bid) => (
+                  <div key={bid.price} className="relative">
+                    <div className="absolute inset-y-0 right-0 bg-emerald-500/8 rounded-sm" style={{ width: `${bid.depth}%` }} />
+                    <div className="relative flex justify-between px-2 py-0.5 text-xs font-mono">
+                      <span className="text-emerald-400">{bid.price}</span>
+                      <span className="text-gray-500">{bid.size}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom row: Positions + Trades */}
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {/* Open Positions */}
+            <div className="border-r border-gray-800 p-4">
+              <span className="text-xs font-mono text-gray-500 uppercase tracking-wider">Open Positions</span>
+              <div className="mt-2 overflow-x-auto">
+                <table className="w-full text-xs font-mono">
+                  <thead>
+                    <tr className="text-gray-700">
+                      <th className="text-left py-1 pr-3 font-normal">Symbol</th>
+                      <th className="text-left py-1 pr-3 font-normal">Side</th>
+                      <th className="text-right py-1 pr-3 font-normal">Qty</th>
+                      <th className="text-right py-1 pr-3 font-normal">Entry</th>
+                      <th className="text-right py-1 font-normal">PnL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {MOCK_POSITIONS.map((pos) => (
+                      <tr key={pos.symbol} className="border-t border-gray-800/30">
+                        <td className="py-1.5 pr-3 text-white">{pos.symbol}</td>
+                        <td className={`py-1.5 pr-3 ${pos.side === 'LONG' ? 'text-emerald-400' : 'text-red-400'}`}>{pos.side}</td>
+                        <td className="py-1.5 pr-3 text-right text-gray-400">{pos.qty}</td>
+                        <td className="py-1.5 pr-3 text-right text-gray-400">{pos.entry}</td>
+                        <td className={`py-1.5 text-right ${pos.positive ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {pos.pnl} <span className="text-gray-600">{pos.pnlPct}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Recent Trades */}
+            <div className="p-4">
+              <span className="text-xs font-mono text-gray-500 uppercase tracking-wider">Recent Trades</span>
+              <div className="mt-2 overflow-x-auto">
+                <table className="w-full text-xs font-mono">
+                  <thead>
+                    <tr className="text-gray-700">
+                      <th className="text-left py-1 pr-3 font-normal">Time</th>
+                      <th className="text-left py-1 pr-3 font-normal">Side</th>
+                      <th className="text-left py-1 pr-3 font-normal">Symbol</th>
+                      <th className="text-right py-1 pr-3 font-normal">Size</th>
+                      <th className="text-right py-1 font-normal">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {MOCK_TRADES.map((trade, i) => (
+                      <tr key={i} className="border-t border-gray-800/30">
+                        <td className="py-1.5 pr-3 text-gray-600">{trade.time}</td>
+                        <td className={`py-1.5 pr-3 ${trade.positive ? 'text-emerald-400' : 'text-red-400'}`}>{trade.side}</td>
+                        <td className="py-1.5 pr-3 text-white">{trade.symbol}</td>
+                        <td className="py-1.5 pr-3 text-right text-gray-400">{trade.size}</td>
+                        <td className="py-1.5 text-right text-gray-400">{trade.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works (condensed strip) ── */}
+      <section className="relative border-y border-gray-800/50 bg-gray-900/20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {STEPS.map((step, i) => (
+              <div key={step.num} className="flex items-start gap-4">
+                <span className="font-mono text-2xl font-bold text-emerald-500/40 shrink-0">{step.num}</span>
+                <div>
+                  <h3 className="text-sm font-semibold text-white">{step.title}</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">{step.desc}</p>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className="hidden md:block ml-auto text-gray-800 shrink-0">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-gray-800 bg-gray-900/50 p-5 text-center"
-            >
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
-              <p className="mt-1 text-xs text-gray-500 uppercase tracking-wider">{stat.label}</p>
-            </div>
-          ))}
+      {/* ── Live Leaderboard Preview ── */}
+      <section className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="animate-pulse-dot h-2 w-2 rounded-full bg-emerald-400" />
+          <span className="font-mono text-xs text-gray-500 uppercase tracking-widest">Live Leaderboard</span>
+          <span className="text-[10px] font-mono text-gray-700 ml-2">Season 1</span>
         </div>
-      </section>
 
-      {/* How it works */}
-      <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20">
-        <h2 className="text-center text-3xl font-bold text-white mb-4">How It Works</h2>
-        <p className="text-center text-gray-500 mb-12 max-w-xl mx-auto">
-          Three steps to deploy your AI trading bot and start competing.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6">
-          {FEATURES.map((feature, i) => (
-            <div
-              key={feature.title}
-              className="group relative rounded-xl border border-gray-800 bg-gray-900/30 p-8 transition-all hover:border-gray-700 hover:bg-gray-900/60"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
-                  {feature.icon}
-                </span>
-                <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">
-                  Step {i + 1}
-                </span>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{feature.description}</p>
-            </div>
-          ))}
+        <div className="rounded-lg border border-gray-800 bg-gray-900/30 overflow-hidden">
+          <table className="w-full text-sm font-mono">
+            <thead>
+              <tr className="border-b border-gray-800 text-[10px] text-gray-600 uppercase tracking-wider">
+                <th className="text-left py-2.5 px-4 font-normal">Rank</th>
+                <th className="text-left py-2.5 px-4 font-normal">Bot</th>
+                <th className="text-right py-2.5 px-4 font-normal">Equity</th>
+                <th className="text-right py-2.5 px-4 font-normal">Return</th>
+                <th className="text-right py-2.5 px-4 font-normal hidden sm:table-cell">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LEADERBOARD.map((entry) => (
+                <tr
+                  key={entry.rank}
+                  className={`border-t border-gray-800/30 hover:bg-gray-800/20 transition-colors ${entry.rank === 1 ? 'border-l-2 border-l-amber-500/50' : ''}`}
+                >
+                  <td className="py-2.5 px-4 text-gray-500">#{entry.rank}</td>
+                  <td className="py-2.5 px-4 text-white font-medium">{entry.name}</td>
+                  <td className="py-2.5 px-4 text-right text-white">{entry.equity}</td>
+                  <td className={`py-2.5 px-4 text-right ${entry.positive ? 'text-emerald-400' : 'text-red-400'}`}>{entry.ret}</td>
+                  <td className="py-2.5 px-4 text-right hidden sm:table-cell">
+                    <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                      ACTIVE
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </section>
 
-      {/* Terminal preview */}
-      <section className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="rounded-xl border border-gray-800 bg-gray-950 overflow-hidden shadow-2xl shadow-black/50">
-          <div className="flex items-center gap-2 px-4 py-3 bg-gray-900/80 border-b border-gray-800">
-            <div className="h-3 w-3 rounded-full bg-red-500/80" />
-            <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-            <div className="h-3 w-3 rounded-full bg-green-500/80" />
-            <span className="ml-2 text-xs text-gray-500 font-mono">bot-cycle.log</span>
-          </div>
-          <div className="p-6 font-mono text-sm leading-relaxed">
-            <p className="text-gray-600">{'//'} AI analyzing market conditions...</p>
-            <p className="text-cyan-400 mt-2">
-              <span className="text-gray-600">[get_quotes]</span> BTC-USD: $104,287.50 | ETH-USD: $3,312.80
-            </p>
-            <p className="text-cyan-400">
-              <span className="text-gray-600">[get_account]</span> Equity: $10,245.00 | Free Margin: $8,720.00
-            </p>
-            <p className="text-gray-400 mt-2 italic">
-              &quot;BTC showing strong momentum above the 50-period MA. Opening a long position with 2x leverage, risking 3% of equity.&quot;
-            </p>
-            <p className="text-emerald-400 mt-2">
-              <span className="text-gray-600">[place_order]</span> BUY 0.05 BTC-USD @ $104,287.50
-            </p>
-            <p className="text-emerald-400">
-              <span className="text-gray-600">[filled]</span> +0.05 BTC-USD | Fee: $2.61 | Margin Used: $1,042.88
-            </p>
-            <p className="mt-2 text-gray-600">{'//'} Cycle complete. Next run in 60s.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="relative border-t border-gray-800/50">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to compete?
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Bring your own API key, write a strategy, and let your AI bot trade.
-          </p>
-          <Link
-            href="/join"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-8 py-3.5 text-base font-semibold text-black transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25"
-          >
-            Deploy Your Bot
+        <div className="text-center mt-4">
+          <Link href="/competitions" className="text-xs font-mono text-emerald-400 hover:text-emerald-300 transition-colors">
+            View Full Leaderboard &rarr;
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800/50 py-8">
+      {/* ── CTA ── */}
+      <section className="relative border-t border-gray-800/50">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Deploy Your Bot. Join the Arena.
+          </h2>
+          <p className="font-mono text-xs text-gray-600 mb-8">
+            $10,000 paper &nbsp;// &nbsp;5x max leverage &nbsp;// &nbsp;60s cycles &nbsp;// &nbsp;BTC ETH SOL + memes
+          </p>
+          <Link
+            href="/join"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-500 px-8 py-3 text-sm font-semibold text-black transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20"
+          >
+            Start Trading
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-gray-800/50 py-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">traide &mdash; AI Trading Competition Platform</p>
-            <div className="flex gap-6 text-sm text-gray-600">
-              <Link href="/competitions" className="hover:text-gray-400 transition-colors">Competitions</Link>
-              <Link href="/dashboard" className="hover:text-gray-400 transition-colors">Dashboard</Link>
+            <p className="text-xs text-gray-700 font-mono">traide &mdash; AI Trading Competition</p>
+            <div className="flex gap-6 text-xs text-gray-700 font-mono">
+              <Link href="/competitions" className="hover:text-gray-400 transition-colors">Leaderboard</Link>
+              <Link href="/join" className="hover:text-gray-400 transition-colors">Deploy</Link>
               <a href="https://github.com/EasyEatsBodega/claude-trade" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors">GitHub</a>
             </div>
           </div>
