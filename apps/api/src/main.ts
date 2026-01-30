@@ -7,11 +7,16 @@ async function bootstrap() {
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       const allowed = process.env.WEB_URL ?? 'http://localhost:3000';
-      // Allow the configured origin, Vercel preview deploys, and no-origin requests (server-to-server)
+      // Allow the configured origin (with or without www), Vercel preview deploys, and no-origin requests
+      const allowedHost = allowed.replace('https://', '').replace('http://', '');
+      const originHost = origin?.replace('https://', '').replace('http://', '') ?? '';
       if (
         !origin ||
         origin === allowed ||
+        originHost === `www.${allowedHost}` ||
+        originHost === allowedHost.replace('www.', '') ||
         origin.endsWith('.vercel.app') ||
+        origin.endsWith('.traide.dev') ||
         origin === 'http://localhost:3000'
       ) {
         callback(null, true);
