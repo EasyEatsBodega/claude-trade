@@ -13,7 +13,7 @@ export async function scheduleLeaderboardJobs(queue: Queue) {
     JOB_NAMES.EQUITY_SNAPSHOT,
     {},
     {
-      repeat: { every: 5 * 60 * 1000 },
+      repeat: { every: 60_000 },
       removeOnComplete: { count: 50 },
       removeOnFail: { count: 20 },
     },

@@ -57,7 +57,7 @@ export class BotsService {
         user_id: userId,
         competition_id: competitionId,
         name: params.name,
-        model: params.model ?? 'claude-sonnet-4-5-20250929',
+        model: params.model ?? 'claude-sonnet-4-20250514',
       })
       .select('*')
       .single();
@@ -163,6 +163,41 @@ export class BotsService {
       Buffer.from(data.key_iv),
       Buffer.from(data.key_auth_tag),
     );
+  }
+
+  async getBotStatus(botId: string) {
+    const { data: bot } = await this.supabase
+      .from('bots')
+      .select('id, name, is_active, model')
+      .eq('id', botId)
+      .single();
+
+    if (!bot) throw new NotFoundException('Bot not found');
+
+    const { data: secret } = await this.supabase
+      .from('bot_secrets')
+      .select('id')
+      .eq('bot_id', botId)
+      .single();
+
+    const { data: config } = await this.supabase
+      .from('bot_config')
+      .select('strategy_prompt')
+      .eq('bot_id', botId)
+      .single();
+
+    const { data: account } = await this.supabase
+      .from('accounts')
+      .select('id, status, equity')
+      .eq('bot_id', botId)
+      .single();
+
+    return {
+      ...bot,
+      hasApiKey: !!secret,
+      hasStrategy: !!config?.strategy_prompt,
+      account: account ?? null,
+    };
   }
 
   async activateBot(botId: string) {

@@ -21,6 +21,7 @@ export async function syncBotSchedules(queue: Queue): Promise<void> {
     }
 
     const activeBots = await res.json() as { id: string }[];
+    console.log(`[bot-scheduler] Found ${activeBots.length} active bots:`, activeBots.map(b => b.id));
 
     // Get current repeatable jobs
     const existing = await queue.getRepeatableJobs();

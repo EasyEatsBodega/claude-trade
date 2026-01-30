@@ -51,7 +51,19 @@ export class BotsController {
 
   @Patch(':id/activate')
   async activateBot(@Param('id') id: string) {
-    return this.botsService.activateBot(id);
+    try {
+      return await this.botsService.activateBot(id);
+    } catch (err) {
+      throw new HttpException(
+        (err as Error).message ?? 'Failed to activate bot',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get(':id/status')
+  async getBotStatus(@Param('id') id: string) {
+    return this.botsService.getBotStatus(id);
   }
 
   @Patch(':id/deactivate')

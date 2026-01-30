@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 const MODELS = [
   { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4' },
+  { value: 'claude-opus-4-5-20251101', label: 'Claude Opus 4.5' },
   { value: 'claude-haiku-35-20241022', label: 'Claude 3.5 Haiku' },
 ];
 
@@ -54,27 +55,33 @@ export default function JoinPage() {
 
       // Set strategy
       if (strategy.trim()) {
-        await fetch(`${apiBase}/bots/${bot.id}/prompt`, {
+        const promptRes = await fetch(`${apiBase}/bots/${bot.id}/prompt`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ strategyPrompt: strategy }),
         });
+        if (!promptRes.ok) throw new Error('Failed to save strategy prompt');
       }
 
       // Set API key
       if (apiKey.trim()) {
-        await fetch(`${apiBase}/bots/${bot.id}/secret`, {
+        const secretRes = await fetch(`${apiBase}/bots/${bot.id}/secret`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ anthropicApiKey: apiKey }),
         });
+        if (!secretRes.ok) throw new Error('Failed to save API key');
       }
 
       // Activate
-      await fetch(`${apiBase}/bots/${bot.id}/activate`, {
+      const activateRes = await fetch(`${apiBase}/bots/${bot.id}/activate`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
       });
+      if (!activateRes.ok) {
+        const data = await activateRes.json().catch(() => ({}));
+        throw new Error(data.message ?? 'Failed to activate bot');
+      }
 
       router.push(`/bots/${bot.id}`);
     } catch (err) {
