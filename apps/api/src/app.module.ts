@@ -7,6 +7,7 @@ import { MarketDataModule } from './market-data/market-data.module';
 import { TradingModule } from './trading/trading.module';
 import { BotsModule } from './bots/bots.module';
 import { InternalModule } from './internal/internal.module';
+import { PublicModule } from './public/public.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -19,6 +20,7 @@ import { HealthController } from './health/health.controller';
     TradingModule,
     BotsModule,
     InternalModule,
+    PublicModule,
   ],
   controllers: [HealthController],
 })

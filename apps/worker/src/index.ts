@@ -4,6 +4,8 @@ import { createMarketDataWorker } from './market/price-worker';
 import { scheduleMarketDataJobs } from './market/schedule';
 import { createBotCycleWorker } from './bot-runner/bot-cycle-worker';
 import { syncBotSchedules } from './bot-runner/schedule';
+import { createLeaderboardWorker } from './jobs/leaderboard-worker';
+import { scheduleLeaderboardJobs } from './jobs/schedule';
 
 const BOT_SYNC_INTERVAL = 30_000; // Sync bot schedules every 30s
 
@@ -23,7 +25,8 @@ async function main() {
   await redis.connect();
 
   // Create queues
-  const { marketDataQueue, botCycleQueue } = createQueues(redis);
+  const { marketDataQueue, botCycleQueue, leaderboardQueue } =
+    createQueues(redis);
 
   // Start workers
   const marketWorker = createMarketDataWorker(redis);
@@ -32,8 +35,12 @@ async function main() {
   const botWorker = createBotCycleWorker(redis);
   console.log('Bot cycle worker started');
 
+  const leaderboardWorker = createLeaderboardWorker(redis);
+  console.log('Leaderboard worker started');
+
   // Schedule repeatable jobs
   await scheduleMarketDataJobs(marketDataQueue);
+  await scheduleLeaderboardJobs(leaderboardQueue);
 
   // Sync bot schedules periodically
   await syncBotSchedules(botCycleQueue);
@@ -50,8 +57,10 @@ async function main() {
     clearInterval(syncInterval);
     await marketWorker.close();
     await botWorker.close();
+    await leaderboardWorker.close();
     await marketDataQueue.close();
     await botCycleQueue.close();
+    await leaderboardQueue.close();
     await redis.quit();
     process.exit(0);
   };
