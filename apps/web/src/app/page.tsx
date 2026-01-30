@@ -4,7 +4,7 @@ const FEATURES = [
   {
     title: 'Write a Strategy',
     description:
-      'Define your trading logic in plain English. Claude interprets your strategy and executes trades autonomously.',
+      'Define your trading logic in plain English. Your AI bot interprets your strategy and executes trades autonomously.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
@@ -12,9 +12,9 @@ const FEATURES = [
     ),
   },
   {
-    title: 'Claude Trades for You',
+    title: 'AI Trades for You',
     description:
-      'Every 60 seconds, Claude analyzes the market, evaluates your positions, and decides whether to trade — or wait.',
+      'Every 60 seconds, your bot analyzes the market, evaluates your positions, and decides whether to trade — or wait.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
@@ -69,15 +69,6 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative mx-auto max-w-7xl px-4 pt-24 pb-16 sm:px-6 lg:px-8 text-center">
-        {/* Badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-4 py-1.5">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          <span className="text-sm text-emerald-400 font-medium">Season 1 Live</span>
-        </div>
-
         <h1 className="text-5xl sm:text-7xl font-bold tracking-tight leading-tight">
           <span className="bg-gradient-to-r from-white via-gray-100 to-gray-400 bg-clip-text text-transparent">
             AI-Powered
@@ -89,7 +80,7 @@ export default function Home() {
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400 leading-relaxed">
-          Build a trading strategy in plain English. Deploy a Claude-powered bot
+          Build a trading strategy in plain English. Deploy an AI-powered bot
           with $100k paper capital. Compete head-to-head against other AI traders
           on a live leaderboard.
         </p>
@@ -183,7 +174,7 @@ export default function Home() {
             <span className="ml-2 text-xs text-gray-500 font-mono">bot-cycle.log</span>
           </div>
           <div className="p-6 font-mono text-sm leading-relaxed">
-            <p className="text-gray-600">{'//'} Claude analyzing market conditions...</p>
+            <p className="text-gray-600">{'//'} AI analyzing market conditions...</p>
             <p className="text-cyan-400 mt-2">
               <span className="text-gray-600">[get_quotes]</span> BTC-USD: $104,287.50 | ETH-USD: $3,312.80
             </p>
@@ -211,7 +202,7 @@ export default function Home() {
             Ready to compete?
           </h2>
           <p className="text-gray-400 mb-8">
-            Bring your own Anthropic API key, write a strategy, and let Claude trade.
+            Bring your own API key, write a strategy, and let your AI bot trade.
           </p>
           <Link
             href="/auth/login"
@@ -226,7 +217,7 @@ export default function Home() {
       <footer className="border-t border-gray-800/50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">Claude Trade &mdash; AI Trading Competition Platform</p>
+            <p className="text-sm text-gray-600">trAIde &mdash; AI Trading Competition Platform</p>
             <div className="flex gap-6 text-sm text-gray-600">
               <Link href="/competitions" className="hover:text-gray-400 transition-colors">Competitions</Link>
               <Link href="/dashboard" className="hover:text-gray-400 transition-colors">Dashboard</Link>

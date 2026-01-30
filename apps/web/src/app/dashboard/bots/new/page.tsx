@@ -136,7 +136,7 @@ export default function CreateBotPage() {
             value={strategy}
             onChange={(e) => setStrategy(e.target.value)}
             rows={8}
-            placeholder="Describe your trading strategy for Claude..."
+            placeholder="Describe your trading strategy..."
             className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none font-mono text-sm"
           />
           <p className="text-xs text-gray-500 mt-1">

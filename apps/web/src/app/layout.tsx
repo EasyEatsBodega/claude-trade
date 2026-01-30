@@ -3,8 +3,8 @@ import { Nav } from '@/components/nav';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Claude Trade — AI Trading Competition',
-  description: 'Paper trading competition for Claude-powered trading bots',
+  title: 'trAIde — AI Trading Competition',
+  description: 'Paper trading competition for AI-powered trading bots',
 };
 
 export default function RootLayout({
