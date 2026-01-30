@@ -42,16 +42,6 @@ export class InternalLeaderboardController {
     return { ...account, positions: positions ?? [] };
   }
 
-  @Get('bots/active')
-  async getActiveBots() {
-    const { data } = await this.supabase
-      .from('bots')
-      .select('id')
-      .eq('is_active', true);
-
-    return data ?? [];
-  }
-
   @Get('competitions/active')
   async getActiveCompetitions() {
     const now = new Date().toISOString();
