@@ -149,16 +149,16 @@ export default function Home() {
               </div>
 
               {/* SVG Chart */}
-              <div className="relative">
+              <div className="relative flex">
                 {/* Y-axis labels */}
-                <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[9px] font-mono text-gray-700 py-1">
+                <div className="flex flex-col justify-between text-[9px] font-mono text-gray-700 py-1 shrink-0 w-8 sm:w-10">
                   <span>105,200</span>
                   <span>104,800</span>
                   <span>104,400</span>
                   <span>104,000</span>
                   <span>103,600</span>
                 </div>
-                <svg viewBox="0 0 500 180" preserveAspectRatio="none" className="w-full h-44 sm:h-52 ml-8 sm:ml-10">
+                <svg viewBox="0 0 500 180" preserveAspectRatio="none" className="flex-1 min-w-0 h-44 sm:h-52">
                   <defs>
                     <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
@@ -181,7 +181,7 @@ export default function Home() {
                   />
                 </svg>
                 {/* X-axis labels */}
-                <div className="flex justify-between ml-8 sm:ml-10 mt-1 text-[9px] font-mono text-gray-700">
+                <div className="flex justify-between ml-8 sm:ml-10 mt-1 text-[9px] font-mono text-gray-700 overflow-hidden">
                   <span>09:00</span>
                   <span>10:00</span>
                   <span>11:00</span>
