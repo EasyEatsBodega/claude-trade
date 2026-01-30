@@ -26,21 +26,21 @@ export class BotsService {
     model?: string;
   }) {
     // Generate an anonymous user ID for this bot
-    const userId = `anon_${randomUUID()}`;
+    const userId = randomUUID();
 
-    // Ensure user record exists
+    // Ensure user record exists (no auth FK — open platform)
     await this.supabase.from('users').upsert({
       id: userId,
-      display_name: 'Anonymous',
+      display_name: params.name,
     }, { onConflict: 'id' });
 
-    // If no competition ID provided, get the current competition
+    // If no competition ID provided, get the current active competition
     let competitionId = params.competitionId;
     if (!competitionId) {
       const { data: comp } = await this.supabase
         .from('competitions')
         .select('id')
-        .eq('is_active', true)
+        .eq('status', 'active')
         .single();
       competitionId = comp?.id;
     }
