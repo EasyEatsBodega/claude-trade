@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { BotsService } from './bots.service';
 
 @Controller('bots')
@@ -9,7 +9,14 @@ export class BotsController {
   async createBot(
     @Body() body: { name: string; competitionId?: string; model?: string },
   ) {
-    return this.botsService.createBot(body);
+    try {
+      return await this.botsService.createBot(body);
+    } catch (err) {
+      throw new HttpException(
+        (err as Error).message ?? 'Failed to create bot',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Get(':id')

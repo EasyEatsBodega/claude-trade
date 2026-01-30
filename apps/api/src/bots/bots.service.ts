@@ -29,20 +29,30 @@ export class BotsService {
     const userId = randomUUID();
 
     // Ensure user record exists (no auth FK — open platform)
-    await this.supabase.from('users').upsert({
+    const { error: userError } = await this.supabase.from('users').upsert({
       id: userId,
       display_name: params.name,
     }, { onConflict: 'id' });
 
+    if (userError) {
+      this.logger.error(`Failed to create user: ${userError.message}`);
+      throw new Error(`User creation failed: ${userError.message}`);
+    }
+
     // If no competition ID provided, get the current active competition
     let competitionId = params.competitionId;
     if (!competitionId) {
-      const { data: comp } = await this.supabase
+      const { data: comp, error: compError } = await this.supabase
         .from('competitions')
         .select('id')
         .eq('status', 'active')
         .single();
-      competitionId = comp?.id;
+
+      if (compError || !comp) {
+        this.logger.error(`No active competition found: ${compError?.message}`);
+        throw new Error('No active competition found');
+      }
+      competitionId = comp.id;
     }
 
     // Create bot
@@ -57,7 +67,10 @@ export class BotsService {
       .select('*')
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      this.logger.error(`Failed to create bot: ${error.message}`);
+      throw new Error(error.message);
+    }
 
     // Create bot config with empty prompt
     await this.supabase.from('bot_config').insert({
