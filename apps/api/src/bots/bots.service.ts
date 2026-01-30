@@ -1,8 +1,9 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { CryptoService } from '../crypto/crypto.service';
 import { STARTING_BALANCE } from '@claude-trade/shared';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class BotsService {
@@ -19,23 +20,37 @@ export class BotsService {
     );
   }
 
-  async createBot(userId: string, params: {
+  async createBot(params: {
     name: string;
-    competitionId: string;
+    competitionId?: string;
     model?: string;
   }) {
+    // Generate an anonymous user ID for this bot
+    const userId = `anon_${randomUUID()}`;
+
     // Ensure user record exists
     await this.supabase.from('users').upsert({
       id: userId,
-      display_name: 'User',
+      display_name: 'Anonymous',
     }, { onConflict: 'id' });
+
+    // If no competition ID provided, get the current competition
+    let competitionId = params.competitionId;
+    if (!competitionId) {
+      const { data: comp } = await this.supabase
+        .from('competitions')
+        .select('id')
+        .eq('is_active', true)
+        .single();
+      competitionId = comp?.id;
+    }
 
     // Create bot
     const { data: bot, error } = await this.supabase
       .from('bots')
       .insert({
         user_id: userId,
-        competition_id: params.competitionId,
+        competition_id: competitionId,
         name: params.name,
         model: params.model ?? 'claude-sonnet-4-5-20250929',
       })
@@ -53,7 +68,7 @@ export class BotsService {
     // Create trading account
     await this.supabase.from('accounts').insert({
       bot_id: bot.id,
-      competition_id: params.competitionId,
+      competition_id: competitionId,
       cash: STARTING_BALANCE,
       equity: STARTING_BALANCE,
       margin_used: 0,
@@ -61,20 +76,6 @@ export class BotsService {
     });
 
     return bot;
-  }
-
-  async getMyBots(userId: string) {
-    const { data } = await this.supabase
-      .from('bots')
-      .select(`
-        *,
-        bot_config(*),
-        accounts(*)
-      `)
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    return data ?? [];
   }
 
   async getBot(botId: string) {
@@ -92,12 +93,10 @@ export class BotsService {
     return data;
   }
 
-  async updateBot(userId: string, botId: string, params: {
+  async updateBot(botId: string, params: {
     name?: string;
     model?: string;
   }) {
-    await this.verifyOwnership(userId, botId);
-
     const { data } = await this.supabase
       .from('bots')
       .update(params)
@@ -105,12 +104,11 @@ export class BotsService {
       .select('*')
       .single();
 
+    if (!data) throw new NotFoundException('Bot not found');
     return data;
   }
 
-  async updateStrategyPrompt(userId: string, botId: string, strategyPrompt: string) {
-    await this.verifyOwnership(userId, botId);
-
+  async updateStrategyPrompt(botId: string, strategyPrompt: string) {
     const { data } = await this.supabase
       .from('bot_config')
       .update({ strategy_prompt: strategyPrompt })
@@ -121,12 +119,9 @@ export class BotsService {
     return data;
   }
 
-  async setApiKey(userId: string, botId: string, apiKey: string) {
-    await this.verifyOwnership(userId, botId);
-
+  async setApiKey(botId: string, apiKey: string) {
     const { ciphertext, iv, authTag } = this.crypto.encrypt(apiKey);
 
-    // Upsert — insert or update the secret
     await this.supabase
       .from('bot_secrets')
       .upsert(
@@ -162,9 +157,7 @@ export class BotsService {
     );
   }
 
-  async activateBot(userId: string, botId: string) {
-    await this.verifyOwnership(userId, botId);
-
+  async activateBot(botId: string) {
     // Check bot has API key and strategy prompt
     const { data: secret } = await this.supabase
       .from('bot_secrets')
@@ -194,25 +187,12 @@ export class BotsService {
     return { success: true };
   }
 
-  async deactivateBot(userId: string, botId: string) {
-    await this.verifyOwnership(userId, botId);
-
+  async deactivateBot(botId: string) {
     await this.supabase
       .from('bots')
       .update({ is_active: false })
       .eq('id', botId);
 
     return { success: true };
-  }
-
-  private async verifyOwnership(userId: string, botId: string) {
-    const { data } = await this.supabase
-      .from('bots')
-      .select('user_id')
-      .eq('id', botId)
-      .single();
-
-    if (!data) throw new NotFoundException('Bot not found');
-    if (data.user_id !== userId) throw new ForbiddenException('Not your bot');
   }
 }

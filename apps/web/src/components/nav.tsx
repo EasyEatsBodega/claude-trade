@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 export function Nav() {
   return (
@@ -16,33 +15,17 @@ export function Nav() {
               <span className="text-lg font-bold text-white">trAIde</span>
             </Link>
             <div className="hidden sm:flex items-center gap-6">
-              <Link
-                href="/competitions"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
+              <Link href="/competitions" className="text-sm text-gray-400 hover:text-white transition-colors">
                 Competitions
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                Dashboard
               </Link>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-            <SignedOut>
-              <Link
-                href="/sign-in"
-                className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-400 transition-colors"
-              >
-                Sign In
-              </Link>
-            </SignedOut>
-          </div>
+          <Link
+            href="/join"
+            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-400 transition-colors"
+          >
+            Deploy Bot
+          </Link>
         </div>
       </div>
     </nav>

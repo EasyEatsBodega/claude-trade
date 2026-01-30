@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@clerk/nextjs';
 import { StatusBadge } from '@/components/status-badge';
 import { formatUsd, formatPct } from '@/lib/format';
 import type { AccountState } from '@claude-trade/shared';
@@ -30,49 +29,34 @@ const MODELS = [
 
 export default function ManageBotPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const { getToken } = useAuth();
   const [bot, setBot] = useState<BotDetail | null>(null);
   const [strategy, setStrategy] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [token, setToken] = useState('');
 
   const apiBase =
     process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
   const loadBot = useCallback(async () => {
-    const t = await getToken();
-
-    if (!t) {
-      router.push('/sign-in');
-      return;
-    }
-
-    setToken(t);
-
-    const res = await fetch(`${apiBase}/bots/${id}`, {
-      headers: { Authorization: `Bearer ${t}` },
-    });
+    const res = await fetch(`${apiBase}/bots/${id}`);
 
     if (res.ok) {
       const botData = await res.json() as BotDetail;
       setBot(botData);
       setStrategy(botData.bot_config?.[0]?.strategy_prompt ?? '');
     }
-  }, [id, router, getToken, apiBase]);
+  }, [id, apiBase]);
 
   useEffect(() => {
     loadBot();
   }, [loadBot]);
 
-  async function authFetch(path: string, options?: RequestInit) {
+  async function apiFetchLocal(path: string, options?: RequestInit) {
     return fetch(`${apiBase}${path}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
         ...options?.headers,
       },
     });
@@ -82,7 +66,7 @@ export default function ManageBotPage() {
     setSaving(true);
     setMessage('');
     try {
-      const res = await authFetch(`/bots/${id}/prompt`, {
+      const res = await apiFetchLocal(`/bots/${id}/prompt`, {
         method: 'PATCH',
         body: JSON.stringify({ strategyPrompt: strategy }),
       });
@@ -99,7 +83,7 @@ export default function ManageBotPage() {
     setSaving(true);
     setMessage('');
     try {
-      const res = await authFetch(`/bots/${id}/secret`, {
+      const res = await apiFetchLocal(`/bots/${id}/secret`, {
         method: 'PATCH',
         body: JSON.stringify({ anthropicApiKey: apiKey }),
       });
@@ -117,7 +101,7 @@ export default function ManageBotPage() {
     setSaving(true);
     const endpoint = bot?.is_active ? 'deactivate' : 'activate';
     try {
-      await authFetch(`/bots/${id}/${endpoint}`, { method: 'PATCH' });
+      await apiFetchLocal(`/bots/${id}/${endpoint}`, { method: 'PATCH' });
       await loadBot();
     } catch {
       setMessage('Failed to toggle bot');

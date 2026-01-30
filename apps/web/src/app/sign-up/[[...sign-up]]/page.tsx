@@ -1,9 +1,5 @@
-import { SignUp } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 export default function SignUpPage() {
-  return (
-    <div className="flex min-h-[80vh] items-center justify-center p-8">
-      <SignUp afterSignUpUrl="/dashboard" />
-    </div>
-  );
+  redirect('/join');
 }
