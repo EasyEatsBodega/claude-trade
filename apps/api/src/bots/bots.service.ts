@@ -162,11 +162,19 @@ export class BotsService {
 
     if (!data) return null;
 
-    return this.crypto.decrypt(
-      Buffer.from(data.encrypted_api_key),
-      Buffer.from(data.key_iv),
-      Buffer.from(data.key_auth_tag),
-    );
+    try {
+      // Supabase returns bytea columns as base64-encoded strings
+      const ciphertext = Buffer.from(data.encrypted_api_key, 'base64');
+      const iv = Buffer.from(data.key_iv, 'base64');
+      const authTag = Buffer.from(data.key_auth_tag, 'base64');
+
+      return this.crypto.decrypt(ciphertext, iv, authTag);
+    } catch (err) {
+      this.logger.error(
+        `Failed to decrypt API key for bot ${botId}: ${(err as Error).message}`,
+      );
+      throw err;
+    }
   }
 
   async validateOwnerToken(botId: string, token: string): Promise<boolean> {
