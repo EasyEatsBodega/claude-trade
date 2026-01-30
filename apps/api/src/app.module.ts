@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './redis/redis.module';
 import { MarketDataModule } from './market-data/market-data.module';
+import { TradingModule } from './trading/trading.module';
 import { InternalModule } from './internal/internal.module';
 import { HealthController } from './health/health.controller';
 
@@ -12,6 +13,7 @@ import { HealthController } from './health/health.controller';
     AuthModule,
     RedisModule,
     MarketDataModule,
+    TradingModule,
     InternalModule,
   ],
   controllers: [HealthController],
