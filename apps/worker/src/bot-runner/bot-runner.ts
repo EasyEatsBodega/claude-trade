@@ -198,6 +198,7 @@ async function executeToolCall(
         quantity: input.quantity,
         leverage: input.leverage ?? 1,
         cycleId,
+        reasoning: typeof input.reasoning === 'string' ? input.reasoning.slice(0, 280) : '',
       });
 
     case 'no_trade':

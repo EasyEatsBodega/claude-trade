@@ -18,6 +18,9 @@ export function Nav() {
               <Link href="/competitions" className="text-sm text-gray-400 hover:text-white transition-colors">
                 Leaderboard
               </Link>
+              <Link href="/feed" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Feed
+              </Link>
             </div>
           </div>
           <Link

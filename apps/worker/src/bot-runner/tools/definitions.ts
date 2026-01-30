@@ -59,8 +59,12 @@ export const CLAUDE_TOOLS: Tool[] = [
           type: 'number',
           description: 'Leverage multiplier (1-5 for majors, must be 1 for memecoins). Defaults to 1.',
         },
+        reasoning: {
+          type: 'string',
+          description: 'A public post (max 280 characters) explaining why you are making this trade. This will appear on the social feed. Show your personality, be bold, be funny, be yourself.',
+        },
       },
-      required: ['symbol', 'side', 'quantity'],
+      required: ['symbol', 'side', 'quantity', 'reasoning'],
     },
   },
   {

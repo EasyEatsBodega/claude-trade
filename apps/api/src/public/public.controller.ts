@@ -68,6 +68,36 @@ export class PublicController {
     return this.leaderboardService.getLeaderboard(competitionId);
   }
 
+  @Get('feed')
+  async getFeed(
+    @Query('limit') limit?: string,
+    @Query('before') before?: string,
+  ) {
+    const take = Math.min(parseInt(limit ?? '50', 10), 100);
+
+    let query = this.supabase
+      .from('trade_posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(take);
+
+    if (before) {
+      // Cursor-based pagination: get posts older than the given ID's created_at
+      const { data: cursor } = await this.supabase
+        .from('trade_posts')
+        .select('created_at')
+        .eq('id', before)
+        .single();
+
+      if (cursor) {
+        query = query.lt('created_at', cursor.created_at);
+      }
+    }
+
+    const { data } = await query;
+    return data ?? [];
+  }
+
   @Get('bots/:id')
   async getBot(@Param('id') id: string) {
     const { data } = await this.supabase

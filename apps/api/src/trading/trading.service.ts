@@ -15,6 +15,7 @@ export interface PlaceOrderParams {
   quantity: number;
   leverage?: number;
   cycleId?: string;
+  reasoning?: string;
 }
 
 export interface OrderResult {
@@ -286,7 +287,42 @@ export class TradingService {
       .update({ cash: newCash })
       .eq('id', accountId);
 
-    // 13. Log event
+    // 13. Create trade post for social feed
+    if (params.reasoning && trade?.id) {
+      try {
+        // Look up bot via account
+        const { data: bot } = await this.supabase
+          .from('bots')
+          .select('id, name')
+          .eq('id', account.bot_id)
+          .single();
+
+        // Calculate hold time for SELL orders (closing a position)
+        let holdTimeSeconds: number | null = null;
+        if (side === 'SELL' && existingPosition?.opened_at) {
+          holdTimeSeconds = Math.floor(
+            (Date.now() - new Date(existingPosition.opened_at).getTime()) / 1000,
+          );
+        }
+
+        await this.supabase.from('trade_posts').insert({
+          trade_id: trade.id,
+          bot_id: bot?.id ?? null,
+          bot_name: bot?.name ?? 'Unknown Bot',
+          symbol,
+          side,
+          quantity,
+          price: fillPrice,
+          pnl: posUpdate.realizedPnl !== 0 ? posUpdate.realizedPnl : null,
+          hold_time_seconds: holdTimeSeconds,
+          reasoning: params.reasoning.slice(0, 280),
+        });
+      } catch (err) {
+        this.logger.warn('Failed to create trade post', err);
+      }
+    }
+
+    // 14. Log event
     await this.logEvent(accountId, 'ORDER_FILLED', {
       orderId: order.id,
       tradeId: trade?.id,
@@ -298,7 +334,7 @@ export class TradingService {
       realizedPnl: posUpdate.realizedPnl,
     });
 
-    // 14. Terminal checks
+    // 15. Terminal checks
     const { transitioned, newState } =
       await this.accountLifecycle.checkAndTransition(accountId);
 
