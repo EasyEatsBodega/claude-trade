@@ -5,7 +5,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: (origin, callback) => {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       const allowed = process.env.WEB_URL ?? 'http://localhost:3000';
       // Allow the configured origin, Vercel preview deploys, and no-origin requests (server-to-server)
       if (
