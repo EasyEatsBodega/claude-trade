@@ -12,8 +12,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Queue } from 'bullmq';
-import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { AdminGuard } from './admin.guard';
 import { RedisService } from '../redis/redis.service';
 import { BotsService } from '../bots/bots.service';
@@ -41,19 +41,29 @@ export class AdminController {
   @Post('login')
   async login(@Body() body: { username: string; password: string }) {
     const expectedUsername = this.config.get<string>('ADMIN_USERNAME');
-    const passwordHash = this.config.get<string>('ADMIN_PASSWORD_HASH');
+    const expectedPassword = this.config.get<string>('ADMIN_PASSWORD');
     const jwtSecret = this.config.getOrThrow<string>('ADMIN_JWT_SECRET');
 
-    if (!expectedUsername || !passwordHash) {
+    if (!expectedUsername || !expectedPassword) {
       throw new HttpException('Admin not configured', HttpStatus.SERVICE_UNAVAILABLE);
     }
 
-    if (body.username !== expectedUsername) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
+    // Constant-time comparison to prevent timing attacks
+    const usernameMatch =
+      body.username.length === expectedUsername.length &&
+      timingSafeEqual(
+        createHmac('sha256', 'u').update(body.username).digest(),
+        createHmac('sha256', 'u').update(expectedUsername).digest(),
+      );
 
-    const valid = await bcrypt.compare(body.password, passwordHash);
-    if (!valid) {
+    const passwordMatch =
+      body.password.length === expectedPassword.length &&
+      timingSafeEqual(
+        createHmac('sha256', 'p').update(body.password).digest(),
+        createHmac('sha256', 'p').update(expectedPassword).digest(),
+      );
+
+    if (!usernameMatch || !passwordMatch) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
