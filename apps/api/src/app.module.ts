@@ -7,6 +7,7 @@ import { TradingModule } from './trading/trading.module';
 import { BotsModule } from './bots/bots.module';
 import { InternalModule } from './internal/internal.module';
 import { PublicModule } from './public/public.module';
+import { AdminModule } from './admin/admin.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -19,6 +20,7 @@ import { HealthController } from './health/health.controller';
     BotsModule,
     InternalModule,
     PublicModule,
+    AdminModule,
   ],
   controllers: [HealthController],
 })

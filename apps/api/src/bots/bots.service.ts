@@ -50,6 +50,9 @@ export class BotsService {
       competitionId = comp?.id ?? null;
     }
 
+    // Generate ownership token
+    const ownerToken = randomUUID();
+
     // Create bot
     const { data: bot, error } = await this.supabase
       .from('bots')
@@ -58,6 +61,7 @@ export class BotsService {
         competition_id: competitionId,
         name: params.name,
         model: params.model ?? 'claude-sonnet-4-20250514',
+        owner_token: ownerToken,
       })
       .select('*')
       .single();
@@ -90,7 +94,7 @@ export class BotsService {
     const { data } = await this.supabase
       .from('bots')
       .select(`
-        *,
+        id, user_id, competition_id, name, model, is_active, created_at, updated_at,
         bot_config(*),
         accounts(*)
       `)
@@ -163,6 +167,16 @@ export class BotsService {
       Buffer.from(data.key_iv),
       Buffer.from(data.key_auth_tag),
     );
+  }
+
+  async validateOwnerToken(botId: string, token: string): Promise<boolean> {
+    const { data } = await this.supabase
+      .from('bots')
+      .select('owner_token')
+      .eq('id', botId)
+      .single();
+
+    return data?.owner_token === token;
   }
 
   async getBotStatus(botId: string) {

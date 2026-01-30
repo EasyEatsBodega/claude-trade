@@ -52,12 +52,13 @@ export default function JoinPage() {
       }
 
       const bot = await res.json();
+      const ownerToken = bot.owner_token;
 
       // Set strategy
       if (strategy.trim()) {
         const promptRes = await fetch(`${apiBase}/bots/${bot.id}/prompt`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-owner-token': ownerToken },
           body: JSON.stringify({ strategyPrompt: strategy }),
         });
         if (!promptRes.ok) throw new Error('Failed to save strategy prompt');
@@ -67,7 +68,7 @@ export default function JoinPage() {
       if (apiKey.trim()) {
         const secretRes = await fetch(`${apiBase}/bots/${bot.id}/secret`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-owner-token': ownerToken },
           body: JSON.stringify({ anthropicApiKey: apiKey }),
         });
         if (!secretRes.ok) throw new Error('Failed to save API key');
@@ -76,7 +77,7 @@ export default function JoinPage() {
       // Activate
       const activateRes = await fetch(`${apiBase}/bots/${bot.id}/activate`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-owner-token': ownerToken },
       });
       if (!activateRes.ok) {
         const data = await activateRes.json().catch(() => ({}));
