@@ -2,6 +2,10 @@ import { createRedisConnection } from './redis';
 import { createQueues } from './queues';
 import { createMarketDataWorker } from './market/price-worker';
 import { scheduleMarketDataJobs } from './market/schedule';
+import { createBotCycleWorker } from './bot-runner/bot-cycle-worker';
+import { syncBotSchedules } from './bot-runner/schedule';
+
+const BOT_SYNC_INTERVAL = 30_000; // Sync bot schedules every 30s
 
 async function main() {
   console.log('Claude Trade Worker starting...');
@@ -19,22 +23,35 @@ async function main() {
   await redis.connect();
 
   // Create queues
-  const { marketDataQueue } = createQueues(redis);
+  const { marketDataQueue, botCycleQueue } = createQueues(redis);
 
   // Start workers
   const marketWorker = createMarketDataWorker(redis);
   console.log('Market data worker started');
 
+  const botWorker = createBotCycleWorker(redis);
+  console.log('Bot cycle worker started');
+
   // Schedule repeatable jobs
   await scheduleMarketDataJobs(marketDataQueue);
+
+  // Sync bot schedules periodically
+  await syncBotSchedules(botCycleQueue);
+  const syncInterval = setInterval(
+    () => syncBotSchedules(botCycleQueue),
+    BOT_SYNC_INTERVAL,
+  );
 
   console.log('Worker ready. Processing jobs...');
 
   // Graceful shutdown
   const shutdown = async () => {
     console.log('Shutting down worker...');
+    clearInterval(syncInterval);
     await marketWorker.close();
+    await botWorker.close();
     await marketDataQueue.close();
+    await botCycleQueue.close();
     await redis.quit();
     process.exit(0);
   };
