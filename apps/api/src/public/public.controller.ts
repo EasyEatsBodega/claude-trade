@@ -52,20 +52,36 @@ export class PublicController {
   }
 
   @Get('leaderboard')
-  async getLeaderboard(@Query('competition_id') competitionId: string) {
-    if (!competitionId) {
-      // Get current active competition
-      const { data: comp } = await this.supabase
-        .from('competitions')
-        .select('id')
-        .eq('status', 'active')
-        .limit(1)
-        .single();
-
-      if (!comp) return [];
-      competitionId = comp.id;
+  async getLeaderboard(@Query('competition_id') competitionId?: string) {
+    if (competitionId) {
+      return this.leaderboardService.getLeaderboard(competitionId);
     }
-    return this.leaderboardService.getLeaderboard(competitionId);
+
+    // Global leaderboard: all bots ranked by equity
+    const { data: accounts } = await this.supabase
+      .from('accounts')
+      .select(`
+        id, equity, status, cash, margin_used,
+        bot_id,
+        bots!inner(id, name)
+      `)
+      .order('equity', { ascending: false });
+
+    if (!accounts) return [];
+
+    const startingBalance = 10000;
+    return accounts.map((a: Record<string, unknown>, index: number) => {
+      const bot = a.bots as Record<string, unknown>;
+      const equity = Number(a.equity);
+      return {
+        botId: (bot?.id as string) ?? (a.bot_id as string),
+        botName: (bot?.name as string) ?? 'Unknown',
+        rank: index + 1,
+        equity,
+        returnPct: ((equity - startingBalance) / startingBalance) * 100,
+        accountState: a.status as string,
+      };
+    });
   }
 
   @Get('feed')

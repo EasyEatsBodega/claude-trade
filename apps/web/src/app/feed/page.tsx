@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { Nav } from '../../components/nav';
 
 interface TradePost {
   id: string;
@@ -204,8 +203,7 @@ export default function FeedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Nav />
+    <div className="min-h-screen">
       <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="sticky top-16 z-40 bg-gray-950/90 backdrop-blur-md border-b border-gray-800/50 px-4 py-3">
