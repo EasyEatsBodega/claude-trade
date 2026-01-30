@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { apiFetch } from '@/lib/api';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 interface LeaderboardEntry {
   botId: string;
@@ -10,10 +11,13 @@ interface LeaderboardEntry {
   accountState: string;
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function LeaderboardPage() {
   let entries: LeaderboardEntry[] = [];
   try {
-    entries = await apiFetch<LeaderboardEntry[]>('/public/leaderboard');
+    const res = await fetch(`${API_BASE}/public/leaderboard`, { cache: 'no-store' });
+    if (res.ok) entries = await res.json();
   } catch {
     // API not available
   }
