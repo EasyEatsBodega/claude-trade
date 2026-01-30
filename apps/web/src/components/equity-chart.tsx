@@ -62,7 +62,7 @@ export function EquityChart({ data }: { data: DataPoint[] }) {
     }
 
     // Starting balance line
-    const startY = toY(100000);
+    const startY = toY(10000);
     if (startY >= padding.top && startY <= padding.top + plotH) {
       ctx.strokeStyle = '#374151';
       ctx.setLineDash([4, 4]);
@@ -75,7 +75,7 @@ export function EquityChart({ data }: { data: DataPoint[] }) {
 
     // Line
     const lastEquity = equities[equities.length - 1];
-    const lineColor = lastEquity >= 100000 ? '#22c55e' : '#ef4444';
+    const lineColor = lastEquity >= 10000 ? '#22c55e' : '#ef4444';
 
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = 2;

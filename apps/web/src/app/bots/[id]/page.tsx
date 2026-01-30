@@ -86,7 +86,7 @@ export default async function BotDetailPage({
 
   const account = bot.accounts?.[0];
   const equity = account ? Number(account.equity) : 0;
-  const returnPct = ((equity - 100000) / 100000) * 100;
+  const returnPct = ((equity - 10000) / 10000) * 100;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">

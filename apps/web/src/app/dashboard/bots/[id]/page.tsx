@@ -134,8 +134,8 @@ export default function ManageBotPage() {
   }
 
   const account = bot.accounts?.[0];
-  const equity = account ? Number(account.equity) : 100000;
-  const returnPct = ((equity - 100000) / 100000) * 100;
+  const equity = account ? Number(account.equity) : 10000;
+  const returnPct = ((equity - 10000) / 10000) * 100;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 space-y-8">

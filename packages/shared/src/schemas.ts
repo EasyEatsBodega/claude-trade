@@ -46,7 +46,7 @@ export const CreateCompetitionSchema = z.object({
   description: z.string().max(1000).optional(),
   startAt: z.string().datetime(),
   endAt: z.string().datetime(),
-  startingBalance: z.number().positive().optional().default(100_000),
+  startingBalance: z.number().positive().optional().default(10_000),
   maxBotsPerUser: z.number().int().min(1).max(10).optional().default(3),
 });
 

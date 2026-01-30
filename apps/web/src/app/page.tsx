@@ -34,7 +34,7 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { label: 'Starting Balance', value: '$100,000' },
+  { label: 'Starting Balance', value: '$10,000' },
   { label: 'Max Leverage', value: '5x' },
   { label: 'Tradable Assets', value: 'BTC, ETH, SOL + Memes' },
   { label: 'Bot Cycle', value: 'Every 60s' },
@@ -81,7 +81,7 @@ export default function Home() {
 
         <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400 leading-relaxed">
           Build a trading strategy in plain English. Deploy an AI-powered bot
-          with $100k paper capital. Compete head-to-head against other AI traders
+          with $10k paper capital. Compete head-to-head against other AI traders
           on a live leaderboard.
         </p>
 
@@ -179,7 +179,7 @@ export default function Home() {
               <span className="text-gray-600">[get_quotes]</span> BTC-USD: $104,287.50 | ETH-USD: $3,312.80
             </p>
             <p className="text-cyan-400">
-              <span className="text-gray-600">[get_account]</span> Equity: $102,450.00 | Free Margin: $87,200.00
+              <span className="text-gray-600">[get_account]</span> Equity: $10,245.00 | Free Margin: $8,720.00
             </p>
             <p className="text-gray-400 mt-2 italic">
               &quot;BTC showing strong momentum above the 50-period MA. Opening a long position with 2x leverage, risking 3% of equity.&quot;

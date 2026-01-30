@@ -21,7 +21,7 @@ export const BOT_LIMITS = {
   CYCLE_INTERVAL_MS: 60_000,
 } as const;
 
-export const STARTING_BALANCE = 100_000;
+export const STARTING_BALANCE = 10_000;
 
 export const ACCOUNT_STATES = {
   ACTIVE: 'ACTIVE',

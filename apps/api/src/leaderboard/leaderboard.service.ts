@@ -77,7 +77,7 @@ export class LeaderboardService {
       const bot = a.bots as Record<string, unknown>;
       const user = bot?.users as Record<string, unknown>;
       const comp = a.competitions as Record<string, unknown>;
-      const startingBalance = Number(comp?.starting_balance ?? 100000);
+      const startingBalance = Number(comp?.starting_balance ?? 10000);
       const equity = Number(a.equity);
 
       return {

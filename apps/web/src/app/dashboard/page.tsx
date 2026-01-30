@@ -59,8 +59,8 @@ export default async function DashboardPage() {
         <div className="space-y-3">
           {myBots.map((bot) => {
             const account = bot.accounts?.[0];
-            const equity = account ? Number(account.equity) : 100000;
-            const returnPct = ((equity - 100000) / 100000) * 100;
+            const equity = account ? Number(account.equity) : 10000;
+            const returnPct = ((equity - 10000) / 10000) * 100;
 
             return (
               <Link
