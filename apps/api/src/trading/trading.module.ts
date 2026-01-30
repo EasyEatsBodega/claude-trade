@@ -17,6 +17,6 @@ import { AccountLifecycle } from './account-lifecycle';
     PositionManager,
     AccountLifecycle,
   ],
-  exports: [TradingService, MarginCalculator, FeeCalculator],
+  exports: [TradingService, MarginCalculator, FeeCalculator, AccountLifecycle],
 })
 export class TradingModule {}
