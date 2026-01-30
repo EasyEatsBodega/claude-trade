@@ -1,18 +1,7 @@
-import IORedis from 'ioredis';
-
-function createRedisConnection(): IORedis {
-  const url = process.env.UPSTASH_REDIS_URL;
-  if (!url) {
-    throw new Error('UPSTASH_REDIS_URL is required');
-  }
-
-  return new IORedis(url, {
-    maxRetriesPerRequest: null, // Required for BullMQ
-    connectTimeout: 30000,
-    lazyConnect: true,
-    keepAlive: 10000,
-  });
-}
+import { createRedisConnection } from './redis';
+import { createQueues } from './queues';
+import { createMarketDataWorker } from './market/price-worker';
+import { scheduleMarketDataJobs } from './market/schedule';
 
 async function main() {
   console.log('Claude Trade Worker starting...');
@@ -28,11 +17,24 @@ async function main() {
   });
 
   await redis.connect();
-  console.log('Worker ready. Waiting for jobs...');
+
+  // Create queues
+  const { marketDataQueue } = createQueues(redis);
+
+  // Start workers
+  const marketWorker = createMarketDataWorker(redis);
+  console.log('Market data worker started');
+
+  // Schedule repeatable jobs
+  await scheduleMarketDataJobs(marketDataQueue);
+
+  console.log('Worker ready. Processing jobs...');
 
   // Graceful shutdown
   const shutdown = async () => {
     console.log('Shutting down worker...');
+    await marketWorker.close();
+    await marketDataQueue.close();
     await redis.quit();
     process.exit(0);
   };
