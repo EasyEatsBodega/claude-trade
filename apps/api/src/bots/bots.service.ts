@@ -39,20 +39,15 @@ export class BotsService {
       throw new Error(`User creation failed: ${userError.message}`);
     }
 
-    // If no competition ID provided, get the current active competition
-    let competitionId = params.competitionId;
+    // Try to find active competition (optional — bots can exist without one)
+    let competitionId = params.competitionId ?? null;
     if (!competitionId) {
-      const { data: comp, error: compError } = await this.supabase
+      const { data: comp } = await this.supabase
         .from('competitions')
         .select('id')
         .eq('status', 'active')
         .single();
-
-      if (compError || !comp) {
-        this.logger.error(`No active competition found: ${compError?.message}`);
-        throw new Error('No active competition found');
-      }
-      competitionId = comp.id;
+      competitionId = comp?.id ?? null;
     }
 
     // Create bot
