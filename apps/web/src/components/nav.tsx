@@ -16,7 +16,7 @@ export function Nav() {
             </Link>
             <div className="hidden sm:flex items-center gap-6">
               <Link href="/competitions" className="text-sm text-gray-400 hover:text-white transition-colors">
-                Competitions
+                Leaderboard
               </Link>
             </div>
           </div>

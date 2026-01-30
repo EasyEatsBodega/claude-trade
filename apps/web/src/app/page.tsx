@@ -1,15 +1,5 @@
 import Link from 'next/link';
-
-const TICKER_DATA = [
-  { symbol: 'BTC-PERP', price: '$104,287.50', change: '+2.41%', positive: true, color: '#F7931A' },
-  { symbol: 'ETH-PERP', price: '$3,312.80', change: '-0.87%', positive: false, color: '#627EEA' },
-  { symbol: 'SOL-PERP', price: '$187.42', change: '+5.12%', positive: true, color: '#9945FF' },
-  { symbol: 'DOGE-PERP', price: '$0.1847', change: '+1.23%', positive: true, color: '#C3A634' },
-  { symbol: 'PEPE-PERP', price: '$0.00001247', change: '+8.94%', positive: true, color: '#4E9A06' },
-  { symbol: 'WIF-PERP', price: '$2.34', change: '-3.21%', positive: false, color: '#E8529A' },
-  { symbol: 'BONK-PERP', price: '$0.00002891', change: '+4.67%', positive: true, color: '#F5A623' },
-  { symbol: 'RENDER-PERP', price: '$11.42', change: '+1.89%', positive: true, color: '#00E0FF' },
-];
+import { LiveTicker } from '@/components/live-ticker';
 
 const ORDERBOOK_ASKS = [
   { price: '104,312.50', size: '1.204', depth: 45 },
@@ -56,19 +46,6 @@ const STEPS = [
   { num: '03', title: 'Deploy & Compete', desc: 'Bot trades every 60s on autopilot' },
 ];
 
-function TickerItem({ item }: { item: typeof TICKER_DATA[0] }) {
-  return (
-    <div className="flex items-center gap-3 px-5 border-r border-gray-800/50 shrink-0">
-      <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-      <span className="text-xs font-semibold text-white font-mono">{item.symbol}</span>
-      <span className="text-xs text-gray-400 font-mono">{item.price}</span>
-      <span className={`text-xs font-mono font-semibold ${item.positive ? 'text-emerald-400' : 'text-red-400'}`}>
-        {item.change}
-      </span>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
     <div className="relative overflow-hidden">
@@ -85,15 +62,8 @@ export default function Home() {
       {/* Glow orbs */}
       <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-emerald-500/5 blur-3xl" />
 
-      {/* ── Scrolling Price Ticker ── */}
-      <section className="relative border-b border-gray-800/50 bg-gray-950/80 overflow-hidden">
-        <div className="animate-ticker flex whitespace-nowrap py-3">
-          {/* Render twice for seamless loop */}
-          {[...TICKER_DATA, ...TICKER_DATA].map((item, i) => (
-            <TickerItem key={`${item.symbol}-${i}`} item={item} />
-          ))}
-        </div>
-      </section>
+      {/* ── Live Price Ticker ── */}
+      <LiveTicker />
 
       {/* ── Hero ── */}
       <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-10 sm:px-6 lg:px-8 text-center">
