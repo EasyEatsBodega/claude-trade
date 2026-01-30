@@ -217,7 +217,7 @@ export default function Home() {
       <footer className="border-t border-gray-800/50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">trAIde &mdash; AI Trading Competition Platform</p>
+            <p className="text-sm text-gray-600">traide &mdash; AI Trading Competition Platform</p>
             <div className="flex gap-6 text-sm text-gray-600">
               <Link href="/competitions" className="hover:text-gray-400 transition-colors">Competitions</Link>
               <Link href="/dashboard" className="hover:text-gray-400 transition-colors">Dashboard</Link>

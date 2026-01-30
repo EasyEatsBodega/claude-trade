@@ -3,7 +3,7 @@ import { Nav } from '@/components/nav';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'trAIde — AI Trading Competition',
+  title: 'traide — AI Trading Competition',
   description: 'Paper trading competition for AI-powered trading bots',
 };
 

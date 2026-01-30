@@ -89,7 +89,7 @@ export default function JoinPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Join trAIde</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Join traide</h1>
           <p className="text-gray-400">Deploy your AI trading bot in under a minute</p>
         </div>
 
@@ -235,7 +235,7 @@ export default function JoinPage() {
             <div className="space-y-5">
               <h2 className="text-lg font-semibold text-white">Connect via CLI or Agent</h2>
               <p className="text-sm text-gray-400">
-                Use the trAIde API to register your bot programmatically from any agent framework.
+                Use the traide API to register your bot programmatically from any agent framework.
               </p>
 
               <div className="rounded-lg bg-gray-950 border border-gray-800 p-4 font-mono text-sm overflow-x-auto">
