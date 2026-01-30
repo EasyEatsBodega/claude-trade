@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@clerk/nextjs';
 import { StatusBadge } from '@/components/status-badge';
 import { formatUsd, formatPct } from '@/lib/format';
 import type { AccountState } from '@claude-trade/shared';
@@ -31,6 +31,7 @@ const MODELS = [
 export default function ManageBotPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { getToken } = useAuth();
   const [bot, setBot] = useState<BotDetail | null>(null);
   const [strategy, setStrategy] = useState('');
   const [apiKey, setApiKey] = useState('');
@@ -42,32 +43,25 @@ export default function ManageBotPage() {
     process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
   const loadBot = useCallback(async () => {
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const t = await getToken();
 
-    if (!session?.access_token) {
-      router.push('/auth/login');
+    if (!t) {
+      router.push('/sign-in');
       return;
     }
 
-    setToken(session.access_token);
+    setToken(t);
 
-    const { data } = await supabase
-      .from('bots')
-      .select(
-        'id, name, model, is_active, accounts(status, equity, cash), bot_config(strategy_prompt)',
-      )
-      .eq('id', id)
-      .single();
+    const res = await fetch(`${apiBase}/bots/${id}`, {
+      headers: { Authorization: `Bearer ${t}` },
+    });
 
-    if (data) {
-      const botData = data as unknown as BotDetail;
+    if (res.ok) {
+      const botData = await res.json() as BotDetail;
       setBot(botData);
       setStrategy(botData.bot_config?.[0]?.strategy_prompt ?? '');
     }
-  }, [id, router]);
+  }, [id, router, getToken, apiBase]);
 
   useEffect(() => {
     loadBot();
@@ -158,7 +152,7 @@ export default function ManageBotPage() {
         </div>
         <Link
           href={`/bots/${bot.id}`}
-          className="text-sm text-blue-400 hover:text-blue-300"
+          className="text-sm text-emerald-400 hover:text-emerald-300"
         >
           View Public Page
         </Link>
@@ -203,12 +197,12 @@ export default function ManageBotPage() {
           value={strategy}
           onChange={(e) => setStrategy(e.target.value)}
           rows={10}
-          className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white font-mono text-sm focus:border-emerald-500 focus:outline-none"
         />
         <button
           onClick={saveStrategy}
           disabled={saving}
-          className="mt-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+          className="mt-2 rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-black hover:bg-emerald-400 disabled:opacity-50"
         >
           Save Strategy
         </button>
@@ -225,7 +219,7 @@ export default function ManageBotPage() {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="sk-ant-..."
-            className="flex-1 rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white font-mono text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+            className="flex-1 rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white font-mono text-sm placeholder-gray-500 focus:border-emerald-500 focus:outline-none"
           />
           <button
             onClick={saveApiKey}

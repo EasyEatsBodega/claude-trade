@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { ClerkProvider } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import { Nav } from '@/components/nav';
 import './globals.css';
 
@@ -13,11 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-gray-950 text-white antialiased">
-        <Nav />
-        <main>{children}</main>
-      </body>
-    </html>
+    <ClerkProvider appearance={{ baseTheme: dark }}>
+      <html lang="en">
+        <body className="min-h-screen bg-gray-950 text-white antialiased">
+          <Nav />
+          <main>{children}</main>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

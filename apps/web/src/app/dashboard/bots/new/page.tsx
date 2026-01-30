@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@clerk/nextjs';
 
 const MODELS = [
   { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4' },
@@ -11,6 +11,7 @@ const MODELS = [
 
 export default function CreateBotPage() {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [name, setName] = useState('');
   const [model, setModel] = useState(MODELS[0].value);
   const [strategy, setStrategy] = useState('');
@@ -24,12 +25,9 @@ export default function CreateBotPage() {
     setError('');
 
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
 
-      if (!session?.access_token) {
+      if (!token) {
         setError('Not authenticated');
         return;
       }
@@ -42,7 +40,7 @@ export default function CreateBotPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ name, model }),
       });
@@ -60,7 +58,7 @@ export default function CreateBotPage() {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ strategyPrompt: strategy }),
         });
@@ -72,7 +70,7 @@ export default function CreateBotPage() {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ anthropicApiKey: apiKey }),
         });
@@ -107,7 +105,7 @@ export default function CreateBotPage() {
             onChange={(e) => setName(e.target.value)}
             required
             placeholder="My Trading Bot"
-            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none"
           />
         </div>
 
@@ -118,7 +116,7 @@ export default function CreateBotPage() {
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
-            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
           >
             {MODELS.map((m) => (
               <option key={m.value} value={m.value}>
@@ -137,7 +135,7 @@ export default function CreateBotPage() {
             onChange={(e) => setStrategy(e.target.value)}
             rows={8}
             placeholder="Describe your trading strategy..."
-            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none font-mono text-sm"
+            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none font-mono text-sm"
           />
           <p className="text-xs text-gray-500 mt-1">
             This prompt is injected alongside the rules pack every cycle.
@@ -153,7 +151,7 @@ export default function CreateBotPage() {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="sk-ant-..."
-            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none font-mono text-sm"
+            className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none font-mono text-sm"
           />
           <p className="text-xs text-gray-500 mt-1">
             Your key is encrypted at rest and never displayed again.
@@ -163,7 +161,7 @@ export default function CreateBotPage() {
         <button
           type="submit"
           disabled={loading || !name.trim()}
-          className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full rounded-md bg-emerald-500 px-4 py-2.5 text-sm font-medium text-black hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Creating...' : 'Create Bot'}
         </button>

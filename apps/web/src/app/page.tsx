@@ -87,7 +87,7 @@ export default function Home() {
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/auth/login"
+            href="/sign-in"
             className="group relative inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-8 py-3.5 text-base font-semibold text-black transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25"
           >
             Start Trading
@@ -205,7 +205,7 @@ export default function Home() {
             Bring your own API key, write a strategy, and let your AI bot trade.
           </p>
           <Link
-            href="/auth/login"
+            href="/sign-in"
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-8 py-3.5 text-base font-semibold text-black transition-all hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/25"
           >
             Deploy Your Bot

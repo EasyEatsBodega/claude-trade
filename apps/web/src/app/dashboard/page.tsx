@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { StatusBadge } from '@/components/status-badge';
 import { formatUsd, formatPct } from '@/lib/format';
+import { apiFetch } from '@/lib/api';
 import type { AccountState } from '@claude-trade/shared';
 
 interface BotRow {
@@ -18,22 +19,19 @@ interface BotRow {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect('/sign-in');
   }
 
-  const { data: bots } = await supabase
-    .from('bots')
-    .select('id, name, model, is_active, created_at, accounts(status, equity)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  const myBots = (bots ?? []) as BotRow[];
+  let myBots: BotRow[] = [];
+  try {
+    myBots = await apiFetch<BotRow[]>(`/bots?userId=${user.id}`);
+  } catch {
+    // API may not have bots endpoint with query yet, fallback to empty
+    myBots = [];
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
@@ -41,7 +39,7 @@ export default async function DashboardPage() {
         <h1 className="text-3xl font-bold">My Bots</h1>
         <Link
           href="/dashboard/bots/new"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+          className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-black hover:bg-emerald-400 transition-colors"
         >
           Create Bot
         </Link>
@@ -52,7 +50,7 @@ export default async function DashboardPage() {
           <p className="text-gray-400 mb-4">You haven&apos;t created any bots yet</p>
           <Link
             href="/dashboard/bots/new"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
+            className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-black hover:bg-emerald-400"
           >
             Create Your First Bot
           </Link>

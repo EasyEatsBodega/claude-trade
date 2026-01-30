@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 export function Nav() {
   return (
@@ -29,12 +30,19 @@ export function Nav() {
               </Link>
             </div>
           </div>
-          <Link
-            href="/auth/login"
-            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-400 transition-colors"
-          >
-            Sign In
-          </Link>
+          <div className="flex items-center gap-3">
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black hover:bg-emerald-400 transition-colors"
+              >
+                Sign In
+              </Link>
+            </SignedOut>
+          </div>
         </div>
       </div>
     </nav>
