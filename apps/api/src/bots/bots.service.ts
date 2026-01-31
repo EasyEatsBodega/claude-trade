@@ -134,15 +134,15 @@ export class BotsService {
   async setApiKey(botId: string, apiKey: string) {
     const { ciphertext, iv, authTag } = this.crypto.encrypt(apiKey);
 
-    // Store as base64 strings — Supabase bytea columns expect this format
+    // Supabase bytea columns: use \\x hex prefix so PostgREST stores raw bytes
     await this.supabase
       .from('bot_secrets')
       .upsert(
         {
           bot_id: botId,
-          encrypted_api_key: ciphertext.toString('base64'),
-          key_iv: iv.toString('base64'),
-          key_auth_tag: authTag.toString('base64'),
+          encrypted_api_key: '\\x' + ciphertext.toString('hex'),
+          key_iv: '\\x' + iv.toString('hex'),
+          key_auth_tag: '\\x' + authTag.toString('hex'),
           key_version: 1,
         },
         { onConflict: 'bot_id' },
@@ -154,6 +154,16 @@ export class BotsService {
   /**
    * Internal only — decrypt API key for bot runner.
    */
+  /**
+   * Decode a bytea value returned by Supabase. Handles hex format (\x...) and base64.
+   */
+  private decodeBytea(value: string): Buffer {
+    if (typeof value === 'string' && value.startsWith('\\x')) {
+      return Buffer.from(value.slice(2), 'hex');
+    }
+    return Buffer.from(value, 'base64');
+  }
+
   async decryptApiKey(botId: string): Promise<string | null> {
     const { data } = await this.supabase
       .from('bot_secrets')
@@ -164,10 +174,9 @@ export class BotsService {
     if (!data) return null;
 
     try {
-      // Supabase returns bytea columns as base64-encoded strings
-      const ciphertext = Buffer.from(data.encrypted_api_key, 'base64');
-      const iv = Buffer.from(data.key_iv, 'base64');
-      const authTag = Buffer.from(data.key_auth_tag, 'base64');
+      const ciphertext = this.decodeBytea(data.encrypted_api_key);
+      const iv = this.decodeBytea(data.key_iv);
+      const authTag = this.decodeBytea(data.key_auth_tag);
 
       return this.crypto.decrypt(ciphertext, iv, authTag);
     } catch (err) {

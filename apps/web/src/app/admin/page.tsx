@@ -121,6 +121,7 @@ function BotRow({
   const [cycleResult, setCycleResult] = useState<string | null>(null);
   const [toggleLoading, setToggleLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [keyLoading, setKeyLoading] = useState(false);
 
   async function forceCycle() {
     setCycleLoading(true);
@@ -182,6 +183,32 @@ function BotRow({
       </td>
       <td className="px-3 py-3 text-right">
         <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={async () => {
+              const key = prompt('Enter Anthropic API key for this bot:');
+              if (!key) return;
+              setKeyLoading(true);
+              setCycleResult(null);
+              try {
+                const res = await adminFetch(`/bots/${bot.id}/api-key`, {
+                  method: 'PATCH',
+                  body: JSON.stringify({ anthropicApiKey: key }),
+                });
+                if (!res.ok) throw new Error('Failed');
+                const data = await res.json();
+                setCycleResult(data.message);
+                onAction();
+              } catch {
+                setCycleResult('Failed to update API key');
+              } finally {
+                setKeyLoading(false);
+              }
+            }}
+            disabled={keyLoading}
+            className="px-2 py-1 text-xs rounded border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 disabled:opacity-50 transition-colors"
+          >
+            {keyLoading ? '...' : 'Reset Key'}
+          </button>
           <button
             onClick={forceCycle}
             disabled={cycleLoading}
