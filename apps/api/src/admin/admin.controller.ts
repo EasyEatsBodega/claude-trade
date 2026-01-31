@@ -168,6 +168,26 @@ export class AdminController {
     return { success: true };
   }
 
+  @Patch('bots/:id/api-key')
+  @UseGuards(AdminGuard)
+  async resetApiKey(
+    @Param('id') botId: string,
+    @Body() body: { anthropicApiKey: string },
+  ) {
+    const { data: bot } = await this.supabase
+      .from('bots')
+      .select('id, name')
+      .eq('id', botId)
+      .single();
+
+    if (!bot) {
+      throw new HttpException('Bot not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.botsService.setApiKey(botId, body.anthropicApiKey);
+    return { success: true, message: `API key updated for ${bot.name}` };
+  }
+
   @Delete('bots/:id')
   @UseGuards(AdminGuard)
   async deleteBot(@Param('id') botId: string) {
@@ -182,7 +202,18 @@ export class AdminController {
       throw new HttpException('Bot not found', HttpStatus.NOT_FOUND);
     }
 
-    // Get account IDs for this bot (needed for cleaning up account-linked tables)
+    const errors: string[] = [];
+
+    // Helper: delete and track errors
+    const del = async (table: string, column: string, value: string | string[]) => {
+      const query = Array.isArray(value)
+        ? this.supabase.from(table).delete().in(column, value)
+        : this.supabase.from(table).delete().eq(column, value);
+      const { error } = await query;
+      if (error) errors.push(`${table}: ${error.message}`);
+    };
+
+    // Get account IDs for this bot
     const { data: accounts } = await this.supabase
       .from('accounts')
       .select('id')
@@ -190,30 +221,28 @@ export class AdminController {
 
     const accountIds = (accounts ?? []).map((a) => a.id);
 
-    // Delete account-linked records first (these may lack ON DELETE CASCADE)
+    // Delete account-linked records first
     if (accountIds.length > 0) {
-      await this.supabase.from('equity_snapshots').delete().in('account_id', accountIds);
-      await this.supabase.from('positions').delete().in('account_id', accountIds);
-      await this.supabase.from('trades').delete().in('account_id', accountIds);
-      await this.supabase.from('orders').delete().in('account_id', accountIds);
-      await this.supabase.from('account_events').delete().in('account_id', accountIds);
+      await del('equity_snapshots', 'account_id', accountIds);
+      await del('positions', 'account_id', accountIds);
+      await del('trades', 'account_id', accountIds);
+      await del('orders', 'account_id', accountIds);
+      await del('account_events', 'account_id', accountIds);
     }
 
-    // Delete bot-linked records that lack ON DELETE CASCADE
-    await this.supabase.from('trade_posts').delete().eq('bot_id', botId);
-    await this.supabase.from('leaderboard_snapshots').delete().eq('bot_id', botId);
-
-    // Delete bot_config, bot_secrets, accounts (may have CASCADE, but delete explicitly to be safe)
-    await this.supabase.from('bot_config').delete().eq('bot_id', botId);
-    await this.supabase.from('bot_secrets').delete().eq('bot_id', botId);
-    await this.supabase.from('accounts').delete().eq('bot_id', botId);
+    // Delete bot-linked records
+    await del('trade_posts', 'bot_id', botId);
+    await del('leaderboard_snapshots', 'bot_id', botId);
+    await del('bot_config', 'bot_id', botId);
+    await del('bot_secrets', 'bot_id', botId);
+    await del('accounts', 'bot_id', botId);
 
     // Finally delete the bot itself
-    const { error } = await this.supabase.from('bots').delete().eq('id', botId);
+    await del('bots', 'id', botId);
 
-    if (error) {
+    if (errors.length > 0) {
       throw new HttpException(
-        `Failed to delete bot: ${error.message}`,
+        `Delete had errors: ${errors.join('; ')}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

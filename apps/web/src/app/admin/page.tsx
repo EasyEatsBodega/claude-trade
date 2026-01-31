@@ -204,12 +204,16 @@ function BotRow({
             onClick={async () => {
               if (!confirm(`Delete bot "${bot.name}"? This cannot be undone.`)) return;
               setDeleteLoading(true);
+              setCycleResult(null);
               try {
                 const res = await adminFetch(`/bots/${bot.id}`, { method: 'DELETE' });
-                if (!res.ok) throw new Error('Failed');
+                if (!res.ok) {
+                  const data = await res.json().catch(() => ({}));
+                  throw new Error(data.message ?? `Delete failed (${res.status})`);
+                }
                 onAction();
-              } catch {
-                setCycleResult('Failed to delete');
+              } catch (err) {
+                setCycleResult((err as Error).message);
               } finally {
                 setDeleteLoading(false);
               }
