@@ -182,12 +182,41 @@ export class AdminController {
       throw new HttpException('Bot not found', HttpStatus.NOT_FOUND);
     }
 
-    // Delete related records that lack ON DELETE CASCADE
+    // Get account IDs for this bot (needed for cleaning up account-linked tables)
+    const { data: accounts } = await this.supabase
+      .from('accounts')
+      .select('id')
+      .eq('bot_id', botId);
+
+    const accountIds = (accounts ?? []).map((a) => a.id);
+
+    // Delete account-linked records first (these may lack ON DELETE CASCADE)
+    if (accountIds.length > 0) {
+      await this.supabase.from('equity_snapshots').delete().in('account_id', accountIds);
+      await this.supabase.from('positions').delete().in('account_id', accountIds);
+      await this.supabase.from('trades').delete().in('account_id', accountIds);
+      await this.supabase.from('orders').delete().in('account_id', accountIds);
+      await this.supabase.from('account_events').delete().in('account_id', accountIds);
+    }
+
+    // Delete bot-linked records that lack ON DELETE CASCADE
     await this.supabase.from('trade_posts').delete().eq('bot_id', botId);
     await this.supabase.from('leaderboard_snapshots').delete().eq('bot_id', botId);
 
-    // Delete the bot itself (cascades to bot_config, bot_secrets, accounts → positions, orders, trades, equity_snapshots, account_events)
-    await this.supabase.from('bots').delete().eq('id', botId);
+    // Delete bot_config, bot_secrets, accounts (may have CASCADE, but delete explicitly to be safe)
+    await this.supabase.from('bot_config').delete().eq('bot_id', botId);
+    await this.supabase.from('bot_secrets').delete().eq('bot_id', botId);
+    await this.supabase.from('accounts').delete().eq('bot_id', botId);
+
+    // Finally delete the bot itself
+    const { error } = await this.supabase.from('bots').delete().eq('id', botId);
+
+    if (error) {
+      throw new HttpException(
+        `Failed to delete bot: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
 
     return { success: true, message: `Deleted bot ${bot.name}` };
   }
