@@ -134,14 +134,15 @@ export class BotsService {
   async setApiKey(botId: string, apiKey: string) {
     const { ciphertext, iv, authTag } = this.crypto.encrypt(apiKey);
 
+    // Store as base64 strings — Supabase bytea columns expect this format
     await this.supabase
       .from('bot_secrets')
       .upsert(
         {
           bot_id: botId,
-          encrypted_api_key: ciphertext,
-          key_iv: iv,
-          key_auth_tag: authTag,
+          encrypted_api_key: ciphertext.toString('base64'),
+          key_iv: iv.toString('base64'),
+          key_auth_tag: authTag.toString('base64'),
           key_version: 1,
         },
         { onConflict: 'bot_id' },
