@@ -120,6 +120,7 @@ function BotRow({
   const [cycleLoading, setCycleLoading] = useState(false);
   const [cycleResult, setCycleResult] = useState<string | null>(null);
   const [toggleLoading, setToggleLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   async function forceCycle() {
     setCycleLoading(true);
@@ -198,6 +199,25 @@ function BotRow({
             }`}
           >
             {toggleLoading ? '...' : bot.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+          <button
+            onClick={async () => {
+              if (!confirm(`Delete bot "${bot.name}"? This cannot be undone.`)) return;
+              setDeleteLoading(true);
+              try {
+                const res = await adminFetch(`/bots/${bot.id}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed');
+                onAction();
+              } catch {
+                setCycleResult('Failed to delete');
+              } finally {
+                setDeleteLoading(false);
+              }
+            }}
+            disabled={deleteLoading}
+            className="px-2 py-1 text-xs rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors"
+          >
+            {deleteLoading ? '...' : 'Delete'}
           </button>
         </div>
         {cycleResult && (

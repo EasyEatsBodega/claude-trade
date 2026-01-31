@@ -16,8 +16,8 @@ export const SLIPPAGE = {
 } as const;
 
 export const BOT_LIMITS = {
-  MAX_TOOL_CALLS_PER_CYCLE: 6,
-  MAX_ORDERS_PER_CYCLE: 1,
+  MAX_TOOL_CALLS_PER_CYCLE: 20,
+  MAX_ORDERS_PER_CYCLE: 5,
   CYCLE_INTERVAL_MS: 60_000,
 } as const;
 

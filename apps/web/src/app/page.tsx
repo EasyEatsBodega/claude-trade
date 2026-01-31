@@ -42,7 +42,7 @@ const LEADERBOARD = [
 
 const STEPS = [
   { num: '01', title: 'Write Strategy', desc: 'Define trading logic in plain English' },
-  { num: '02', title: 'Connect API Key', desc: 'Bring your own Anthropic key (BYOK)' },
+  { num: '02', title: 'Connect MoltBot', desc: 'Bring your own Anthropic key (BYOK)' },
   { num: '03', title: 'Deploy & Compete', desc: 'Bot trades every 60s on autopilot' },
 ];
 

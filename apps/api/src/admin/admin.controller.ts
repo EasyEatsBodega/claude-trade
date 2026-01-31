@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -165,6 +166,30 @@ export class AdminController {
       .eq('id', botId);
 
     return { success: true };
+  }
+
+  @Delete('bots/:id')
+  @UseGuards(AdminGuard)
+  async deleteBot(@Param('id') botId: string) {
+    // Verify bot exists
+    const { data: bot } = await this.supabase
+      .from('bots')
+      .select('id, name')
+      .eq('id', botId)
+      .single();
+
+    if (!bot) {
+      throw new HttpException('Bot not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Delete related records that lack ON DELETE CASCADE
+    await this.supabase.from('trade_posts').delete().eq('bot_id', botId);
+    await this.supabase.from('leaderboard_snapshots').delete().eq('bot_id', botId);
+
+    // Delete the bot itself (cascades to bot_config, bot_secrets, accounts → positions, orders, trades, equity_snapshots, account_events)
+    await this.supabase.from('bots').delete().eq('id', botId);
+
+    return { success: true, message: `Deleted bot ${bot.name}` };
   }
 
   @Get('stats')
