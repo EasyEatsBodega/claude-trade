@@ -11,10 +11,14 @@ import {
   Post,
 } from '@nestjs/common';
 import { BotsService } from './bots.service';
+import { TradingService } from '../trading/trading.service';
 
 @Controller('bots')
 export class BotsController {
-  constructor(private botsService: BotsService) {}
+  constructor(
+    private botsService: BotsService,
+    private tradingService: TradingService,
+  ) {}
 
   private async requireOwner(botId: string, ownerToken?: string) {
     if (!ownerToken) {
@@ -104,5 +108,59 @@ export class BotsController {
   ) {
     await this.requireOwner(id, ownerToken);
     return this.botsService.deactivateBot(id);
+  }
+
+  // ── Agent trading endpoints ──────────────────────────────
+
+  @Get(':id/account')
+  async getAccount(
+    @Param('id') id: string,
+    @Headers('x-owner-token') ownerToken: string,
+  ) {
+    await this.requireOwner(id, ownerToken);
+    return this.botsService.getBotAccount(id);
+  }
+
+  @Post(':id/orders')
+  async placeOrder(
+    @Param('id') id: string,
+    @Headers('x-owner-token') ownerToken: string,
+    @Body()
+    body: {
+      symbol: string;
+      side: 'BUY' | 'SELL';
+      quantity: number;
+      leverage?: number;
+      reasoning?: string;
+    },
+  ) {
+    await this.requireOwner(id, ownerToken);
+
+    // Rate limit: max 3 orders per 60s per bot
+    await this.botsService.checkOrderRateLimit(id);
+
+    const accountId = await this.botsService.getAccountIdForBot(id);
+    if (!accountId) {
+      throw new HttpException('Bot has no trading account', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      const result = await this.tradingService.placeOrder({
+        accountId,
+        symbol: body.symbol,
+        side: body.side,
+        quantity: body.quantity,
+        leverage: body.leverage ?? 1,
+        reasoning: typeof body.reasoning === 'string'
+          ? body.reasoning.slice(0, 280)
+          : undefined,
+      });
+      return result;
+    } catch (err) {
+      throw new HttpException(
+        (err as Error).message ?? 'Order failed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

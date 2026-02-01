@@ -1,14 +1,16 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { CryptoService } from '../crypto/crypto.service';
 import { STARTING_BALANCE } from '@claude-trade/shared';
 import { randomUUID } from 'crypto';
+import Redis from 'ioredis';
 
 @Injectable()
 export class BotsService {
   private readonly logger = new Logger(BotsService.name);
   private supabase: SupabaseClient;
+  private redis: Redis;
 
   constructor(
     private config: ConfigService,
@@ -18,6 +20,9 @@ export class BotsService {
       this.config.getOrThrow('SUPABASE_URL'),
       this.config.getOrThrow('SUPABASE_SERVICE_ROLE_KEY'),
     );
+    this.redis = new Redis(this.config.getOrThrow('REDIS_URL'), {
+      maxRetriesPerRequest: 3,
+    });
   }
 
   async createBot(params: {
@@ -87,7 +92,42 @@ export class BotsService {
       status: 'ACTIVE',
     });
 
-    return bot;
+    const apiBase = `https://traide.dev/api`;
+
+    return {
+      ...bot,
+      instructions: {
+        welcome: `You are now a trader on traide. You have $${STARTING_BALANCE.toLocaleString()} in paper money. Trade well.`,
+        endpoints: {
+          get_universe: `GET ${apiBase}/public/universe`,
+          get_quotes: `GET ${apiBase}/public/quotes?symbols=MAJOR:BTC-USD,MAJOR:ETH-USD`,
+          get_account: `GET ${apiBase}/bots/${bot.id}/account`,
+          place_order: `POST ${apiBase}/bots/${bot.id}/orders`,
+        },
+        auth: {
+          header: 'x-owner-token',
+          token: bot.owner_token,
+          note: 'Include this header on /account and /orders requests.',
+        },
+        order_schema: {
+          symbol: 'string (e.g. MAJOR:BTC-USD or SOL:<token_address>)',
+          side: 'BUY | SELL',
+          quantity: 'number (positive)',
+          leverage: 'number 1-5 (majors only, default 1)',
+          reasoning: 'string max 280 chars (posted to public feed)',
+        },
+        rules: {
+          starting_balance: `$${STARTING_BALANCE.toLocaleString()}`,
+          majors: 'BTC, ETH, SOL, AVAX, LINK, DOGE, ADA — LONG and SHORT allowed, leverage 1-5x',
+          memecoins: 'Spot only — BUY and SELL, no shorting, no leverage',
+          rate_limit: 'Max 3 orders per 60 seconds',
+          fees: '0.05% majors, 0.30% memecoins',
+          liquidation: 'If equity < 50% of margin used, all positions closed. Game over.',
+        },
+        leaderboard: 'https://traide.dev/competitions',
+        bot_page: `https://traide.dev/bots/${bot.id}`,
+      },
+    };
   }
 
   async getBot(botId: string) {
@@ -221,27 +261,8 @@ export class BotsService {
   }
 
   async activateBot(botId: string) {
-    // Check bot has API key and strategy prompt
-    const { data: secret } = await this.supabase
-      .from('bot_secrets')
-      .select('id')
-      .eq('bot_id', botId)
-      .single();
-
-    if (!secret) {
-      throw new Error('Bot must have an API key before activation');
-    }
-
-    const { data: config } = await this.supabase
-      .from('bot_config')
-      .select('strategy_prompt')
-      .eq('bot_id', botId)
-      .single();
-
-    if (!config?.strategy_prompt) {
-      throw new Error('Bot must have a strategy prompt before activation');
-    }
-
+    // Agent-driven bots don't need API key or strategy — they trade directly
+    // Server-driven bots (BYOK) still need both
     await this.supabase
       .from('bots')
       .update({ is_active: true })
@@ -257,5 +278,49 @@ export class BotsService {
       .eq('id', botId);
 
     return { success: true };
+  }
+
+  // ── Agent trading helpers ──────────────────────────────
+
+  async getBotAccount(botId: string) {
+    const { data: account } = await this.supabase
+      .from('accounts')
+      .select('*')
+      .eq('bot_id', botId)
+      .single();
+
+    if (!account) throw new NotFoundException('Account not found for this bot');
+
+    const { data: positions } = await this.supabase
+      .from('positions')
+      .select('*')
+      .eq('account_id', account.id)
+      .eq('is_open', true);
+
+    return { ...account, positions: positions ?? [] };
+  }
+
+  async getAccountIdForBot(botId: string): Promise<string | null> {
+    const { data } = await this.supabase
+      .from('accounts')
+      .select('id')
+      .eq('bot_id', botId)
+      .single();
+
+    return data?.id ?? null;
+  }
+
+  async checkOrderRateLimit(botId: string): Promise<void> {
+    const key = `rate:orders:${botId}`;
+    const count = await this.redis.incr(key);
+    if (count === 1) {
+      await this.redis.expire(key, 60);
+    }
+    if (count > 3) {
+      throw new HttpException(
+        'Rate limit: max 3 orders per 60 seconds',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
   }
 }
