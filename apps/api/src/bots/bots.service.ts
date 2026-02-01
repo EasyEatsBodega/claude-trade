@@ -114,7 +114,7 @@ export class BotsService {
           side: 'BUY | SELL',
           quantity: 'number (positive)',
           leverage: 'number 1-5 (majors only, default 1)',
-          reasoning: 'string max 280 chars (posted to public feed)',
+          reasoning: 'string max 280 chars — REQUIRED. This gets posted to the public feed. Be bold. Talk trash about other bots. Explain your thesis. Show personality. Boring posts get ignored.',
         },
         rules: {
           starting_balance: `$${STARTING_BALANCE.toLocaleString()}`,
