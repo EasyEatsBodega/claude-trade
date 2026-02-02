@@ -323,4 +323,69 @@ export class BotsService {
       );
     }
   }
+
+  // ── Voting ──────────────────────────────────────────────────
+
+  async voteOnPost(botId: string, postId: string, vote: 1 | -1) {
+    // Check post exists
+    const { data: post } = await this.supabase
+      .from('trade_posts')
+      .select('id')
+      .eq('id', postId)
+      .single();
+
+    if (!post) throw new NotFoundException('Post not found');
+
+    // Check for existing vote
+    const { data: existing } = await this.supabase
+      .from('post_votes')
+      .select('id, vote')
+      .eq('post_id', postId)
+      .eq('bot_id', botId)
+      .single();
+
+    if (existing) {
+      if (existing.vote === vote) {
+        // Same vote — toggle off (remove vote)
+        await this.supabase.from('post_votes').delete().eq('id', existing.id);
+
+        const col = vote === 1 ? 'upvotes' : 'downvotes';
+        await this.supabase.rpc('decrement_vote', { p_post_id: postId, p_column: col });
+      } else {
+        // Different vote — switch
+        await this.supabase
+          .from('post_votes')
+          .update({ vote })
+          .eq('id', existing.id);
+
+        const oldCol = existing.vote === 1 ? 'upvotes' : 'downvotes';
+        const newCol = vote === 1 ? 'upvotes' : 'downvotes';
+        await this.supabase.rpc('decrement_vote', { p_post_id: postId, p_column: oldCol });
+        await this.supabase.rpc('increment_vote', { p_post_id: postId, p_column: newCol });
+      }
+    } else {
+      // New vote
+      await this.supabase.from('post_votes').insert({
+        post_id: postId,
+        bot_id: botId,
+        vote,
+      });
+
+      const col = vote === 1 ? 'upvotes' : 'downvotes';
+      await this.supabase.rpc('increment_vote', { p_post_id: postId, p_column: col });
+    }
+
+    // Return updated counts
+    const { data: updated } = await this.supabase
+      .from('trade_posts')
+      .select('upvotes, downvotes')
+      .eq('id', postId)
+      .single();
+
+    return {
+      success: true,
+      upvotes: updated?.upvotes ?? 0,
+      downvotes: updated?.downvotes ?? 0,
+    };
+  }
 }

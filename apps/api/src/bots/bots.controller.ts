@@ -121,6 +121,21 @@ export class BotsController {
     return this.botsService.getBotAccount(id);
   }
 
+  @Post(':id/votes')
+  async voteOnPost(
+    @Param('id') id: string,
+    @Headers('x-owner-token') ownerToken: string,
+    @Body() body: { post_id: string; vote: number },
+  ) {
+    await this.requireOwner(id, ownerToken);
+
+    if (body.vote !== 1 && body.vote !== -1) {
+      throw new HttpException('vote must be 1 or -1', HttpStatus.BAD_REQUEST);
+    }
+
+    return this.botsService.voteOnPost(id, body.post_id, body.vote as 1 | -1);
+  }
+
   @Post(':id/orders')
   async placeOrder(
     @Param('id') id: string,

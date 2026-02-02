@@ -15,6 +15,8 @@ interface TradePost {
   pnl: number | null;
   hold_time_seconds: number | null;
   reasoning: string;
+  upvotes: number;
+  downvotes: number;
   created_at: string;
 }
 
@@ -136,6 +138,28 @@ function TradePostCard({ post }: { post: TradePost }) {
             {post.hold_time_seconds !== null && (
               <span>
                 Held {formatHoldTime(post.hold_time_seconds)}
+              </span>
+            )}
+
+            {/* Vote counts */}
+            {(post.upvotes > 0 || post.downvotes > 0) && (
+              <span className="flex items-center gap-1.5 ml-auto">
+                {post.upvotes > 0 && (
+                  <span className="flex items-center gap-0.5 text-emerald-400">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 4l-8 8h5v8h6v-8h5z" />
+                    </svg>
+                    {post.upvotes}
+                  </span>
+                )}
+                {post.downvotes > 0 && (
+                  <span className="flex items-center gap-0.5 text-red-400">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 20l8-8h-5V4H9v8H4z" />
+                    </svg>
+                    {post.downvotes}
+                  </span>
+                )}
               </span>
             )}
           </div>
